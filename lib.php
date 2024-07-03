@@ -26,14 +26,15 @@
 /**
  * Check if an activity is sits mapped.
  *
+ * @param string $modtype The activity type.
  */
-function sitsmapped($cmid) {
+function local_ass_type_sitsmapped($cmid): bool {
     global $DB;
 
     $dbman = $DB->get_manager();
     $table = 'local_sitsgradepush_mapping';
     if ($dbman->table_exists($table)) {
-        if ($DB->get_record($table, array('sourceid' => $cmid), 'id')) {
+        if ($DB->get_record($table, ['sourceid' => $cmid], 'id')) {
             return true;
         }
     }
@@ -43,8 +44,9 @@ function sitsmapped($cmid) {
 /**
  * Check if an activity can be summative.
  *
+ * @param string $modtype The activity type e.g. quiz.
  */
-function canbesummative($modtype) {
+function local_ass_type_canbesummative($modtype): bool {
     // Activites which can be marked summative.
     $modarray = [
         'assign',
@@ -62,13 +64,15 @@ function canbesummative($modtype) {
 /**
  * Add Formative or Summative select options to mods.
  *
+ * @param moodleform $formwrapper
+ * @param MoodleQuickForm $mform
  */
 function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
-    global $DB, $PAGE, $CFG;
+    global $DB;
 
     $cm = $formwrapper->get_current();
     // Check list of mods where this is enabled.
-    if (!canbesummative($cm->modulename)) {
+    if (!local_ass_type_canbesummative($cm->modulename)) {
         return; // Exit if not enabled.
     }
 
@@ -80,7 +84,7 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     // Flag if sits mapped.
     $sitsmapped = false;
     if ($cmid) {
-        $sitsmapped = sitsmapped($cmid);
+        $sitsmapped = local_ass_type_sitsmapped($cmid);
     }
 
     // Mform element.
@@ -95,7 +99,7 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     if ($sitsmapped) {
         $attributes['disabled'] = 'disabled';
     }
-    $select = $mform->createElement('select', 'assessment_type', get_string('fieldlabel','local_ass_type'), $options, $attributes);
+    $select = $mform->createElement('select', 'assessment_type', get_string('fieldlabel', 'local_ass_type'), $options, $attributes);
 
     // Set to summative when sits mapped.
     if ($sitsmapped) {
@@ -104,17 +108,17 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
 
     // Set existing option from db (when not sits mapped or new).
     if (!$sitsmapped && $cmid) {
-        $table = 'ass_type';
-        if ($record = $DB->get_record($table, array('cmid' => $cmid), 'type')) {
+        if ($record = $DB->get_record('local_ass_type', ['cmid' => $cmid], 'type')) {
             $select->setSelected($record->type);
         }
     }
 
     // Link to edit when cm exists.
-    // TODO - lang string.
+    $link = '';
     if ($cmid) {
+        $url = new \moodle_url('/local/sitsgradepush/dashboard.php', ['id' => $cm->course]);
         $link = '<br>
-        <a href="' . $CFG->wwwroot. '/local/sitsgradepush/dashboard.php?id=' .$cm->course. '" target="_blank">'
+        <a href="' . $url . '" target="_blank">'
         . get_string('editinsits', 'local_ass_type') .
         '</a>';
     }
@@ -126,7 +130,6 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     '</div>');
 
     // Add form elements to the dom.
-    // TODO - check best place in the form to add?
     $mform->insertElementBefore($select, 'introeditor');
     $mform->insertElementBefore($info, 'introeditor');
 }
@@ -134,19 +137,21 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
 /**
  * Save Formative or Summative select options.
  *
+ * @param stdClass $data Data from the form submission.
+ * @param stdClass $course The course.
  */
-function local_ass_type_coursemodule_edit_post_actions($data, $course) {
-    global $DB, $PAGE;
-    $table = 'ass_type';
+function local_ass_type_coursemodule_edit_post_actions($data, $course): stdClass {
+    global $DB;
+    $table = 'local_ass_type';
 
     // Record for update/insert.
     $r = new \stdClass();
-    $r->type = $data->type;
-    $r->cmid = $PAGE->cm->id;
+    $r->type = $data->assessment_type;
+    $r->cmid = $data->coursemodule;
     $r->courseid = $course->id;
 
     // If record exists.
-    if ( $record = $DB->get_record($table, array('cmid' => $r->cmid), 'id, type') ) {
+    if ( $record = $DB->get_record($table, ['cmid' => $r->cmid], 'id, type') ) {
         // If record has changed.
         if ($record->type != $r->type) {
             $r->id = $record->id;
