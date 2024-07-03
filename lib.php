@@ -65,7 +65,7 @@ function canbesummative($modtype) {
  * Add Formative or Summative select options to mods.
  *
  */
-function theme_ucl_coursemodule_standard_elements($formwrapper, $mform) {
+function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     global $DB, $PAGE, $CFG;
 
     $cm = $formwrapper->get_current();
@@ -136,7 +136,7 @@ function theme_ucl_coursemodule_standard_elements($formwrapper, $mform) {
  * Save Formative or Summative select options.
  *
  */
-function theme_ucl_coursemodule_edit_post_actions($data, $course) {
+function local_ass_type_coursemodule_edit_post_actions($data, $course) {
     global $DB, $PAGE;
     $table = 'ass_type';
 
