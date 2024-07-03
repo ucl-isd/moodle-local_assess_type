@@ -26,7 +26,7 @@
 /**
  * Check if an activity is sits mapped.
  *
- * @param string $modtype The activity type.
+ * @param int $cmid The activity id.
  */
 function local_ass_type_sitsmapped($cmid): bool {
     global $DB;
