@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
-
 namespace local_ass_type\privacy;
 
 /**
@@ -32,7 +31,6 @@ namespace local_ass_type\privacy;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
-
 class provider implements \core_privacy\local\metadata\null_provider {
 
     /**

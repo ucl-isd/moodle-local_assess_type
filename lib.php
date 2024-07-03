@@ -23,9 +23,7 @@
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
- defined('MOODLE_INTERNAL') || die();
-
- /**
+/**
  * Check if an activity is sits mapped.
  *
  */
@@ -52,7 +50,7 @@ function canbesummative($modtype) {
         'assign',
         'quiz',
         'workshop',
-        'turnitintooltwo'
+        'turnitintooltwo',
     ];
 
     if (in_array($modtype, $modarray)) {
@@ -147,7 +145,7 @@ function local_ass_type_coursemodule_edit_post_actions($data, $course) {
     $r->cmid = $PAGE->cm->id;
     $r->courseid = $course->id;
 
-    // If record exists
+    // If record exists.
     if ( $record = $DB->get_record($table, array('cmid' => $r->cmid), 'id, type') ) {
         // If record has changed.
         if ($record->type != $r->type) {
