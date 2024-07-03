@@ -87,9 +87,9 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
 
     // Mform element.
     $options = [];
-    $options[''] = 'Select an option';
-    $options['0'] = 'Formative - does not contribute to course mark';
-    $options['1'] = 'Summative - counts towards course mark and is mapped in SITS';
+    $options[''] = get_string('defaultoption', 'local_ass_type');
+    $options['0'] = get_string('formativeoption', 'local_ass_type');
+    $options['1'] = get_string('summativeoption', 'local_ass_type');
     $attributes = [];
     $attributes['required'] = 'required';
 
@@ -97,7 +97,7 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     if ($sitsmapped) {
         $attributes['disabled'] = 'disabled';
     }
-    $select = $mform->createElement('select', 'type', 'Formative or summative?', $options, $attributes);
+    $select = $mform->createElement('select', 'assessment_type', get_string('fieldlabel','local_ass_type'), $options, $attributes);
 
     // Set to summative when sits mapped.
     if ($sitsmapped) {
@@ -115,16 +115,17 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     // Link to edit when cm exists.
     // TODO - lang string.
     if ($cmid) {
-        $link .= '<br>
-        <a href="' . $CFG->wwwroot. '/local/sitsgradepush/dashboard.php?id=' .$cm->course. '" target="_blank"
-        >Edit activity SITS link
-        </a>';
+        $link = '<br>
+        <a href="' . $CFG->wwwroot. '/local/sitsgradepush/dashboard.php?id=' .$cm->course. '" target="_blank">'
+        . get_string('editinsits', 'local_ass_type') .
+        '</a>';
     }
 
     $info = $mform->createElement('html',
-    '<div class="col-md-9 offset-md-3 pb-3">
-    Summative activities count towards the course mark in SITS and are flagged to learners as mandatory.'
-    . $link .'</div>');
+    '<div class="col-md-9 offset-md-3 pb-3">'
+    . get_string('info', 'local_ass_type') .
+    $link .
+    '</div>');
 
     // Add form elements to the dom.
     // TODO - check best place in the form to add?
