@@ -99,7 +99,13 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     if ($sitsmapped) {
         $attributes['disabled'] = 'disabled';
     }
-    $select = $mform->createElement('select', 'assessment_type', get_string('fieldlabel', 'local_assess_type'), $options, $attributes);
+    $select = $mform->createElement(
+        'select',
+        'assessment_type',
+        get_string('fieldlabel', 'local_assess_type'),
+        $options,
+        $attributes
+    );
 
     // Set to summative when sits mapped.
     if ($sitsmapped) {
