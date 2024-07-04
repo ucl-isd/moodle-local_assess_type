@@ -17,7 +17,7 @@
 /**
  * Version.
  *
- * @package    local_ass_type
+ * @package    local_assess_type
  * @copyright  2024 onwards University College London {@link https://www.ucl.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_ass_type';
+$plugin->component = 'local_assess_type';
 $plugin->release = '1.0';
 $plugin->version = 2024030700;
 $plugin->requires = 2023100900;

@@ -17,7 +17,7 @@
 /**
  * Lib.
  *
- * @package    local_ass_type
+ * @package    local_assess_type
  * @copyright  2024 onwards University College London {@link https://www.ucl.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
@@ -28,7 +28,7 @@
  *
  * @param int $cmid The activity id.
  */
-function local_ass_type_sitsmapped($cmid): bool {
+function local_assess_type_sitsmapped($cmid): bool {
     global $DB;
 
     $dbman = $DB->get_manager();
@@ -46,7 +46,7 @@ function local_ass_type_sitsmapped($cmid): bool {
  *
  * @param string $modtype The activity type e.g. quiz.
  */
-function local_ass_type_canbesummative($modtype): bool {
+function local_assess_type_canbesummative($modtype): bool {
     // Activites which can be marked summative.
     $modarray = [
         'assign',
@@ -67,12 +67,12 @@ function local_ass_type_canbesummative($modtype): bool {
  * @param moodleform $formwrapper
  * @param MoodleQuickForm $mform
  */
-function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
+function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) {
     global $DB;
 
     $cm = $formwrapper->get_current();
     // Check list of mods where this is enabled.
-    if (!local_ass_type_canbesummative($cm->modulename)) {
+    if (!local_assess_type_canbesummative($cm->modulename)) {
         return; // Exit if not enabled.
     }
 
@@ -84,14 +84,14 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     // Flag if sits mapped.
     $sitsmapped = false;
     if ($cmid) {
-        $sitsmapped = local_ass_type_sitsmapped($cmid);
+        $sitsmapped = local_assess_type_sitsmapped($cmid);
     }
 
     // Mform element.
     $options = [];
-    $options[''] = get_string('defaultoption', 'local_ass_type');
-    $options['0'] = get_string('formativeoption', 'local_ass_type');
-    $options['1'] = get_string('summativeoption', 'local_ass_type');
+    $options[''] = get_string('defaultoption', 'local_assess_type');
+    $options['0'] = get_string('formativeoption', 'local_assess_type');
+    $options['1'] = get_string('summativeoption', 'local_assess_type');
     $attributes = [];
     $attributes['required'] = 'required';
 
@@ -99,7 +99,7 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
     if ($sitsmapped) {
         $attributes['disabled'] = 'disabled';
     }
-    $select = $mform->createElement('select', 'assessment_type', get_string('fieldlabel', 'local_ass_type'), $options, $attributes);
+    $select = $mform->createElement('select', 'assessment_type', get_string('fieldlabel', 'local_assess_type'), $options, $attributes);
 
     // Set to summative when sits mapped.
     if ($sitsmapped) {
@@ -108,7 +108,7 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
 
     // Set existing option from db (when not sits mapped or new).
     if (!$sitsmapped && $cmid) {
-        if ($record = $DB->get_record('local_ass_type', ['cmid' => $cmid], 'type')) {
+        if ($record = $DB->get_record('local_assess_type', ['cmid' => $cmid], 'type')) {
             $select->setSelected($record->type);
         }
     }
@@ -119,13 +119,13 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
         $url = new \moodle_url('/local/sitsgradepush/dashboard.php', ['id' => $cm->course]);
         $link = '<br>
         <a href="' . $url . '" target="_blank">'
-        . get_string('editinsits', 'local_ass_type') .
+        . get_string('editinsits', 'local_assess_type') .
         '</a>';
     }
 
     $info = $mform->createElement('html',
     '<div class="col-md-9 offset-md-3 pb-3">'
-    . get_string('info', 'local_ass_type') .
+    . get_string('info', 'local_assess_type') .
     $link .
     '</div>');
 
@@ -140,9 +140,9 @@ function local_ass_type_coursemodule_standard_elements($formwrapper, $mform) {
  * @param stdClass $data Data from the form submission.
  * @param stdClass $course The course.
  */
-function local_ass_type_coursemodule_edit_post_actions($data, $course): stdClass {
+function local_assess_type_coursemodule_edit_post_actions($data, $course): stdClass {
     global $DB;
-    $table = 'local_ass_type';
+    $table = 'local_assess_type';
 
     // Record for update/insert.
     $r = new \stdClass();

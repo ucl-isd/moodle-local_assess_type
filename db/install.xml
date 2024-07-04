@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/ass_type/db" VERSION="20240701" COMMENT="XMLDB file for UCL"
+<XMLDB PATH="local/assess_type/db" VERSION="20240701" COMMENT="XMLDB file for UCL"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_ass_type" COMMENT="Assessment type db table.">
+    <TABLE NAME="local_assess_type" COMMENT="Assessment type db table.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key of course id"/>
