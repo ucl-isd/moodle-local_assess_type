@@ -34,7 +34,8 @@ function local_assess_type_sitsmapped($cmid): bool {
     $dbman = $DB->get_manager();
     $table = 'local_sitsgradepush_mapping';
     if ($dbman->table_exists($table)) {
-        if ($DB->get_record($table, ['sourceid' => $cmid], 'id')) {
+        $conditions = ['sourceid' => $cmid, 'sourcetype' => 'mod'];
+        if ($DB->get_record($table, $conditions, 'id')) {
             return true;
         }
     }
