@@ -148,6 +148,12 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
  * @param stdClass $course The course.
  */
 function local_assess_type_coursemodule_edit_post_actions($data, $course): stdClass {
+    // Check assessment_type is in $data.
+    // It is impossible to not be set in GUI, but Behat throws a wobly without this.
+    if (!isset($data->assessment_type)) {
+        return $data;
+    }
+
     global $DB;
     $table = 'local_assess_type';
 
@@ -158,7 +164,7 @@ function local_assess_type_coursemodule_edit_post_actions($data, $course): stdCl
     $r->courseid = $course->id;
 
     // If record exists.
-    if ( $record = $DB->get_record($table, ['cmid' => $r->cmid], 'id, type') ) {
+    if ($record = $DB->get_record($table, ['cmid' => $r->cmid], 'id, type')) {
         // If record has changed.
         if ($record->type != $r->type) {
             $r->id = $record->id;
