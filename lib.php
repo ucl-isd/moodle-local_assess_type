@@ -93,6 +93,7 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     $options[''] = get_string('defaultoption', 'local_assess_type');
     $options['0'] = get_string('formativeoption', 'local_assess_type');
     $options['1'] = get_string('summativeoption', 'local_assess_type');
+    $options['2'] = get_string('dummyoption', 'local_assess_type');;
     $attributes = [];
     $attributes['required'] = 'required';
 

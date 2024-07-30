@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['defaultoption'] = 'Select an option';
+$string['dummyoption'] = 'Dummy activity - neither formative or summative';
 $string['editinsits'] = 'Edit activity SITS link';
 $string['fieldlabel'] = 'Formative or summative?';
 $string['formativeoption'] = 'Formative - does not contribute to course mark';
