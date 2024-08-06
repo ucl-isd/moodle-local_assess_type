@@ -35,5 +35,5 @@ $string['formativeoption'] = 'Formative - does not contribute to course mark';
 $string['info'] = 'Summative activities count towards the course mark in SITS and are flagged to learners as mandatory.';
 $string['pluginname'] = 'Assessment type';
 $string['privacy:metadata'] = 'Assessment type does not store any personal data.';
-$string['summativeoption'] = 'Summative';
+$string['summative'] = 'Summative';
 $string['summativeoption'] = 'Summative - counts towards course mark and is mapped in SITS';

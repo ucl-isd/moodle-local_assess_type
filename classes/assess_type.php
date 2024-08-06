@@ -19,6 +19,7 @@ namespace local_assess_type;
 /**
  * Assessment type class.
  *
+ * @package    local_assess_type
  * @copyright  2024 onwards University College London {@link https://www.ucl.ac.uk/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
@@ -33,7 +34,7 @@ class assess_type {
      */
     public static function get_type_int(int $cmid): ?int {
         global $DB;
-        if ($r = $DB->get_record('assign', ['cmid' => $cmid])) {
+        if ($r = $DB->get_record('local_assess_type', ['cmid' => $cmid])) {
             return $r->type;
         }
         return null;
@@ -46,8 +47,8 @@ class assess_type {
      * @return string|null
      */
     public static function get_type_name(int $cmid): ?string {
-        if ($type_int = $this->get_type_int($cmid)) {
-            switch ($type_int) {
+        if ($typeint = self::get_type_int($cmid)) {
+            switch ($typeint) {
                 case '0':
                     return get_string('formative', 'local_assess_type');
                 case '1':
@@ -68,7 +69,7 @@ class assess_type {
      * @return bool
      */
     public static function is_summative(int $cmid): bool {
-        if ($this->get_type_int($cmid) == '1') {
+        if (self::get_type_int($cmid) == '1') {
             return true;
         }
         return false;
@@ -77,8 +78,8 @@ class assess_type {
     /**
      * Update the assess type.
      *
-     * @param int $courseid - The course id.
      * @param int $cmid - The mod id.
+     * @param int $courseid - The course id.
      * @param int $type - formative/summative/dummy.
      */
     public static function update_type(int $cmid, int $courseid, int $type) {
