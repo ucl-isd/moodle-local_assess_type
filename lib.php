@@ -159,7 +159,7 @@ function local_assess_type_coursemodule_edit_post_actions($data, $course): stdCl
     }
 
     // We have data, update the assessment type.
-    assess_type::update_type($data->coursemodule, $course->id, $data->assessment_type);
+    assess_type::update_type($data->coursemodule, $course->id, (int)$data->assessment_type);
 
     // Carry on with other form things.
     return $data;
