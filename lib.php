@@ -23,6 +23,9 @@
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
+
+use local_assess_type\assess_type;
+
 /**
  * Check if an activity is sits mapped.
  *
@@ -155,33 +158,9 @@ function local_assess_type_coursemodule_edit_post_actions($data, $course): stdCl
         return $data;
     }
 
-    global $DB;
-    $table = 'local_assess_type';
+    // We have data, update the assessment type.
+    assess_type::update_type($data->coursemodule, $course->id, $data->assessment_type);
 
-    // Record for update/insert.
-    $r = new \stdClass();
-    $r->type = $data->assessment_type;
-    $r->cmid = $data->coursemodule;
-    $r->courseid = $course->id;
-
-    // If record exists.
-    if ($record = $DB->get_record($table, ['cmid' => $r->cmid], 'id, type')) {
-        // If record has changed.
-        if ($record->type != $r->type) {
-            $r->id = $record->id;
-            $DB->update_record(
-                $table,
-                $r,
-                $bulk = false
-            );
-        }
-    } else {
-        $DB->insert_record(
-            $table,
-            $r,
-            $returnid = false,
-            $bulk = false
-        );
-    }
+    // Carry on with other form things.
     return $data;
 }

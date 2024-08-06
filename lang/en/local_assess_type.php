@@ -26,11 +26,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['defaultoption'] = 'Select an option';
+$string['dummy'] = 'Dummy activity';
 $string['dummyoption'] = 'Dummy activity - neither formative or summative';
 $string['editinsits'] = 'Edit activity SITS link';
 $string['fieldlabel'] = 'Formative or summative?';
+$string['formative'] = 'Formative';
 $string['formativeoption'] = 'Formative - does not contribute to course mark';
 $string['info'] = 'Summative activities count towards the course mark in SITS and are flagged to learners as mandatory.';
 $string['pluginname'] = 'Assessment type';
 $string['privacy:metadata'] = 'Assessment type does not store any personal data.';
+$string['summativeoption'] = 'Summative';
 $string['summativeoption'] = 'Summative - counts towards course mark and is mapped in SITS';
