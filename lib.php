@@ -27,45 +27,6 @@
 use local_assess_type\assess_type;
 
 /**
- * Check if an activity is sits mapped.
- *
- * @param int $cmid The activity id.
- */
-function local_assess_type_sitsmapped($cmid): bool {
-    global $DB;
-
-    $dbman = $DB->get_manager();
-    $table = 'local_sitsgradepush_mapping';
-    if ($dbman->table_exists($table)) {
-        $conditions = ['sourceid' => $cmid, 'sourcetype' => 'mod'];
-        if ($DB->get_record($table, $conditions, 'id')) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * Check if an activity can be summative.
- *
- * @param string $modtype The activity type e.g. quiz.
- */
-function local_assess_type_canbesummative($modtype): bool {
-    // Activites which can be marked summative.
-    $modarray = [
-        'assign',
-        'quiz',
-        'workshop',
-        'turnitintooltwo',
-    ];
-
-    if (in_array($modtype, $modarray)) {
-        return true;
-    }
-    return false;
-}
-
-/**
  * Add Formative or Summative select options to mods.
  *
  * @param moodleform $formwrapper
@@ -75,8 +36,9 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     global $DB;
 
     $cm = $formwrapper->get_current();
+
     // Check list of mods where this is enabled.
-    if (!local_assess_type_canbesummative($cm->modulename)) {
+    if (!assess_type::canbesummative($cm->modulename)) {
         return; // Exit if not enabled.
     }
 
@@ -88,7 +50,7 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     // Flag if sits mapped.
     $sitsmapped = false;
     if ($cmid) {
-        $sitsmapped = local_assess_type_sitsmapped($cmid);
+        $sitsmapped = assess_type::is_sitsmapped($cmid, $cm->course);
     }
 
     // Mform element.
@@ -129,16 +91,15 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     if ($cmid) {
         $url = new \moodle_url('/local/sitsgradepush/dashboard.php', ['id' => $cm->course]);
         $link = '<br>
-        <a href="' . $url . '" target="_blank">'
-        . get_string('editinsits', 'local_assess_type') .
-        '</a>';
+            <a href="' . $url . '" target="_blank">'
+                . get_string('editinsits', 'local_assess_type') .
+            '</a>';
     }
 
     $info = $mform->createElement('html',
-    '<div class="col-md-9 offset-md-3 pb-3">'
-    . get_string('info', 'local_assess_type') .
-    $link .
-    '</div>');
+        '<div class="col-md-9 offset-md-3 pb-3">'
+            . get_string('info', 'local_assess_type') . $link .
+        '</div>');
 
     // Add form elements to the dom.
     $mform->insertElementBefore($select, 'introeditor');
@@ -159,6 +120,7 @@ function local_assess_type_coursemodule_edit_post_actions($data, $course): stdCl
     }
 
     // We have data, update the assessment type.
+    // N.B. Casting (int)assessment_type to stop core Behat error.
     assess_type::update_type($data->coursemodule, $course->id, (int)$data->assessment_type);
 
     // Carry on with other form things.

@@ -27,10 +27,29 @@ namespace local_assess_type;
 class assess_type {
 
     /**
+     * Return if an activity can be summative.
+     *
+     * @param string $modtype The activity type e.g. quiz.
+     */
+    public static function canbesummative(string $modtype): bool {
+        // Activites which can be marked summative.
+        $modarray = [
+            'assign',
+            'quiz',
+            'workshop',
+            'turnitintooltwo',
+        ];
+
+        if (in_array($modtype, $modarray)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Return assess type int - helper for other functions.
      *
      * @param int $cmid
-     * @return int|null
      */
     public static function get_type_int(int $cmid): ?int {
         global $DB;
@@ -44,7 +63,6 @@ class assess_type {
      * Return the assess type name - summative, formative or other.
      *
      * @param int $cmid
-     * @return string|null
      */
     public static function get_type_name(int $cmid): ?string {
         if ($typeint = self::get_type_int($cmid)) {
@@ -66,11 +84,26 @@ class assess_type {
      * Return if assess type is summative.
      *
      * @param int $cmid
-     * @return bool
      */
     public static function is_summative(int $cmid): bool {
         if (self::get_type_int($cmid) == '1') {
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return if assess is sits mapped.
+     *
+     * @param int $cmid The activity id.
+     * @param int $cid The course id.
+     */
+    public static function is_sitsmapped(int $cmid, int $cid): bool {
+        global $CFG;
+        // Check if local_sitsgradepush is installed.
+        if (file_exists($CFG->dirroot . '/local/sitsgradepush/version.php')) {
+            require_once($CFG->dirroot . '/local/sitsgradepush/classes/external/is_coursemodule_mapped.php');
+            return \local_sitsgradepush\external\is_coursemodule_mapped::execute($cmid);
         }
         return false;
     }
