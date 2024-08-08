@@ -37,3 +37,4 @@ $string['pluginname'] = 'Assessment type';
 $string['privacy:metadata'] = 'Assessment type does not store any personal data.';
 $string['summative'] = 'Summative';
 $string['summativeoption'] = 'Summative - counts towards course mark and is mapped in SITS';
+$string['warning'] = 'This activity must be marked as Formative or Summative.';
