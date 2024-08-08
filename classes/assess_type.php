@@ -103,7 +103,8 @@ class assess_type {
         // Check if local_sitsgradepush is installed.
         if (file_exists($CFG->dirroot . '/local/sitsgradepush/version.php')) {
             require_once($CFG->dirroot . '/local/sitsgradepush/classes/external/is_coursemodule_mapped.php');
-            return \local_sitsgradepush\external\is_coursemodule_mapped::execute($cmid);
+            $result = \local_sitsgradepush\external\is_coursemodule_mapped::execute($cmid);
+            return $result->mapped;
         }
         return false;
     }
