@@ -104,7 +104,7 @@ class assess_type {
         if (file_exists($CFG->dirroot . '/local/sitsgradepush/version.php')) {
             require_once($CFG->dirroot . '/local/sitsgradepush/classes/external/is_coursemodule_mapped.php');
             $result = \local_sitsgradepush\external\is_coursemodule_mapped::execute($cmid);
-            return $result->mapped;
+            return $result['mapped'];
         }
         return false;
     }
