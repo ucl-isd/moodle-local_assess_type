@@ -96,9 +96,8 @@ class assess_type {
      * Return if assess is sits mapped.
      *
      * @param int $cmid The activity id.
-     * @param int $cid The course id.
      */
-    public static function is_sitsmapped(int $cmid, int $cid): bool {
+    public static function is_sitsmapped(int $cmid): bool {
         global $CFG;
         // Check if local_sitsgradepush is installed.
         if (file_exists($CFG->dirroot . '/local/sitsgradepush/version.php')) {

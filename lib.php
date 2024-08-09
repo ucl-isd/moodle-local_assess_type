@@ -50,7 +50,7 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     // Flag if sits mapped.
     $sitsmapped = false;
     if ($cmid) {
-        $sitsmapped = assess_type::is_sitsmapped($cmid, $cm->course);
+        $sitsmapped = assess_type::is_sitsmapped($cmid);
     }
 
     // Mform element.
