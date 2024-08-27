@@ -35,15 +35,18 @@ defined('MOODLE_INTERNAL') || die();
  */
 class backup_local_assess_type_plugin extends backup_local_plugin {
 
+
     protected function define_module_plugin_structure() {
         $plugin = $this->get_plugin_element();
         $pluginwrapper = new backup_nested_element($this->get_recommended_name(),
             ['id'],
-            ['courseid', 'cmid', 'type']
+            ['type']
         );
         $plugin->add_child($pluginwrapper);
-        $pluginwrapper->set_source_sql('SELECT * FROM {local_assess_type} WHERE  cmid = :cmid AND type IS NOT NULL',
-        ['cmid' => backup::VAR_PARENTID]);
+        $pluginwrapper->set_source_sql(
+            'SELECT id, type FROM {local_assess_type} WHERE cmid = :cmid AND type IS NOT NULL',
+            ['cmid' => backup::VAR_PARENTID]
+        );
         return $plugin;
     }
 }

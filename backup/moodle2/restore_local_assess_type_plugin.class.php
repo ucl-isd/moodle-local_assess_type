@@ -38,24 +38,19 @@ class restore_local_assess_type_plugin extends restore_local_plugin {
     protected function define_module_plugin_structure() {
         $paths = array();
         // restore_path_element needs postfix of 'process_*', path in xml.
-        $paths[] = new restore_path_element('local_assess_type', $this->get_pathfor('/plugin_local_assess_type_module'));
+        $pathname = 'plugin_local_assess_type_module';
+        $paths[] = new restore_path_element($pathname, "/module/$pathname");
         return $paths;
     }
 
-    public function process_local_assess_type($data) {
+    public function process_plugin_local_assess_type_module($data) {
         global $DB;
         $table = 'local_assess_type';
         // Record for update/insert.
         $r = new \stdClass();
-        $r->type = $data->type;
+        $r->type = $data['type'];
         $r->cmid = $this->task->get_moduleid();
         $r->courseid =  $this->task->get_courseid();
-
-        $DB->insert_record(
-            $table,
-            $r,
-            $returnid = false,
-            $bulk = false
-        );
+        $DB->insert_record($table, $r);
     }
 }
