@@ -121,7 +121,7 @@ function local_assess_type_coursemodule_edit_post_actions($data, $course): stdCl
 
     // We have data, update the assessment type.
     // N.B. Casting (int)assessment_type to stop core Behat error.
-    assess_type::update_type($data->coursemodule, $course->id, (int)$data->assessment_type);
+    assess_type::update_type($course->id, (int)$data->assessment_type, $data->coursemodule);
 
     // Carry on with other form things.
     return $data;
