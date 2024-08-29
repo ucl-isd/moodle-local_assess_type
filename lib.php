@@ -47,10 +47,10 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     if ($cmid = $cm->coursemodule) {
         $newcm = false;
     }
-    // Flag if sits mapped.
-    $sitsmapped = false;
+    // Flag if locked (normally by SITS marks transfer plugin).
+    $locked = false;
     if ($cmid) {
-        $sitsmapped = assess_type::is_sitsmapped($cmid);
+        $locked = assess_type::is_locked($cmid);
     }
 
     // Mform element.
@@ -62,8 +62,8 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     $attributes = [];
     $attributes['required'] = 'required';
 
-    // Disable changes when sits mapped.
-    if ($sitsmapped) {
+    // Disable changes when locked.
+    if ($locked) {
         $attributes['disabled'] = 'disabled';
     }
     $select = $mform->createElement(
@@ -74,13 +74,13 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
         $attributes
     );
 
-    // Set to summative when sits mapped.
-    if ($sitsmapped) {
+    // Set to summative when locked.
+    if ($locked) {
         $select->setSelected(1);
     }
 
-    // Set existing option from db (when not sits mapped or new).
-    if (!$sitsmapped && $cmid) {
+    // Set existing option from db (when not locked or new).
+    if (!$locked && $cmid) {
         if ($record = $DB->get_record('local_assess_type', ['cmid' => $cmid], 'type')) {
             $select->setSelected($record->type);
         }

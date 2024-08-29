@@ -93,17 +93,14 @@ class assess_type {
     }
 
     /**
-     * Return if assess is sits mapped.
+     * Return if assess is locked.
      *
      * @param int $cmid The activity id.
      */
-    public static function is_sitsmapped(int $cmid): bool {
-        global $CFG;
-        // Check if local_sitsgradepush is installed.
-        if (file_exists($CFG->dirroot . '/local/sitsgradepush/version.php')) {
-            require_once($CFG->dirroot . '/local/sitsgradepush/classes/external/is_coursemodule_mapped.php');
-            $result = \local_sitsgradepush\external\is_coursemodule_mapped::execute($cmid);
-            return $result['mapped'];
+    public static function is_locked(int $cmid): bool {
+        global $DB;
+        if ($r = $DB->get_record('local_assess_type', ['cmid' => $cmid])) {
+            return $r->locked;
         }
         return false;
     }
@@ -114,8 +111,9 @@ class assess_type {
      * @param int $cmid - The mod id.
      * @param int $courseid - The course id.
      * @param int $type - formative/summative/dummy.
+     * @param int $locked - Lock field.
      */
-    public static function update_type(int $cmid, int $courseid, int $type) {
+    public static function update_type(int $cmid, int $courseid, int $type, int $locked = 0) {
         global $DB;
         $table = 'local_assess_type';
 
@@ -124,6 +122,7 @@ class assess_type {
         $r->type = $type;
         $r->cmid = $cmid;
         $r->courseid = $courseid;
+        $r->locked = $locked;
 
         // If record exists.
         if ($record = $DB->get_record($table, ['cmid' => $cmid], 'id, type')) {
