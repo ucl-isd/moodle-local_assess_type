@@ -133,7 +133,7 @@ class assess_type {
           'type' => $type,
           'cmid' => $cmid,
           'courseid' => $courseid,
-          'locked' => $locked
+          'locked' => $locked,
         ];
 
         // Check if the record already exists.
