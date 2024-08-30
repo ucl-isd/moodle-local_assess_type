@@ -26,6 +26,15 @@ namespace local_assess_type;
  */
 class assess_type {
 
+    /** @var int Assessment type formative */
+    const ASSESS_TYPE_FORMATIVE = 0;
+
+    /** @var int Assessment type summative */
+    const ASSESS_TYPE_SUMMATIVE = 1;
+
+    /** @var int Assessment type dummy */
+    const ASSESS_TYPE_DUMMY = 2;
+
     /**
      * Return if an activity can be summative.
      *
@@ -34,10 +43,10 @@ class assess_type {
     public static function canbesummative(string $modtype): bool {
         // Activites which can be marked summative.
         $modarray = [
-            'assign',
-            'quiz',
-            'workshop',
-            'turnitintooltwo',
+          'assign',
+          'quiz',
+          'workshop',
+          'turnitintooltwo',
         ];
 
         if (in_array($modtype, $modarray)) {
@@ -67,11 +76,11 @@ class assess_type {
     public static function get_type_name(int $cmid): ?string {
         if ($typeint = self::get_type_int($cmid)) {
             switch ($typeint) {
-                case '0':
+                case self::ASSESS_TYPE_FORMATIVE:
                     return get_string('formative', 'local_assess_type');
-                case '1':
+                case self::ASSESS_TYPE_SUMMATIVE:
                     return get_string('summative', 'local_assess_type');
-                case '2':
+                case self::ASSESS_TYPE_DUMMY:
                     return get_string('dummy', 'local_assess_type');
                 default:
                     return "Not set"; // This should never happen.
@@ -86,7 +95,7 @@ class assess_type {
      * @param int $cmid
      */
     public static function is_summative(int $cmid): bool {
-        if (self::get_type_int($cmid) == '1') {
+        if (self::get_type_int($cmid) == self::ASSESS_TYPE_SUMMATIVE) {
             return true;
         }
         return false;
@@ -112,39 +121,34 @@ class assess_type {
      * @param int $courseid - The course id.
      * @param int $type - formative/summative/dummy.
      * @param int $locked - Lock field.
+     *
+     * @throws \dml_exception
      */
-    public static function update_type(int $cmid, int $courseid, int $type, int $locked = 0) {
+    public static function update_type(int $cmid, int $courseid, int $type, int $locked = 0): void {
         global $DB;
         $table = 'local_assess_type';
 
-        // Record to write.
-        $r = new \stdClass();
-        $r->type = $type;
-        $r->cmid = $cmid;
-        $r->courseid = $courseid;
-        $r->locked = $locked;
+        // Prepare the record to write.
+        $record = (object) [
+          'type' => $type,
+          'cmid' => $cmid,
+          'courseid' => $courseid,
+          'locked' => $locked,
+        ];
 
-        // If record exists.
-        if ($record = $DB->get_record($table, ['cmid' => $cmid], 'id, type')) {
-            // If record has changed.
-            if ($record->type != $type) {
-                $r->id = $record->id;
-                // Update record.
-                $DB->update_record(
-                    $table,
-                    $r,
-                    $bulk = false
-                );
+        // Check if the record already exists.
+        $existingrecord = $DB->get_record($table, ['cmid' => $cmid], 'id, type, locked');
+
+        // If the record exists and has changed, update it.
+        if ($existingrecord) {
+            if ($existingrecord->type === $type && $existingrecord->locked === $locked) {
+                return; // No changes needed.
             }
+            $record->id = $existingrecord->id;
+            $DB->update_record($table, $record);
         } else {
-            // New record.
-            $DB->insert_record(
-                $table,
-                $r,
-                $returnid = false,
-                $bulk = false
-            );
+            // Insert a new record if it doesn't exist.
+            $DB->insert_record($table, $record, false);
         }
     }
-
 }
