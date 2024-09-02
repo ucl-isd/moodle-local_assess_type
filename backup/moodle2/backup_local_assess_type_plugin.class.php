@@ -23,19 +23,18 @@
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
- /**
- * Database:
- *
- * assess_type(id, courseid, cmid, type)
- */
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Database: assess_type(id, courseid, cmid, type)
  * Backup assess_type
  */
 class backup_local_assess_type_plugin extends backup_local_plugin {
 
 
+    /**
+     * Define structure.
+     * @return backup_plugin_element
+     * @throws base_element_struct_exception
+     */
     protected function define_module_plugin_structure() {
         $plugin = $this->get_plugin_element();
         $pluginwrapper = new backup_nested_element($this->get_recommended_name(),

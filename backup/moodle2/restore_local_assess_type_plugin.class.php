@@ -23,26 +23,30 @@
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
- /**
- * Database:
- *
- * assess_type(id, courseid, cmid, type)
- */
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Database: assess_type(id, courseid, cmid, type)
  * Restore assess_type
  */
 class restore_local_assess_type_plugin extends restore_local_plugin {
 
+    /**
+     * Define structure.
+     * @return array
+     */
     protected function define_module_plugin_structure() {
-        $paths = array();
-        // restore_path_element needs postfix of 'process_*', path in xml.
+        $paths = [];
+        // The restore_path_element needs postfix of 'process_*', path in xml.
         $pathname = 'plugin_local_assess_type_module';
         $paths[] = new restore_path_element($pathname, "/module/$pathname");
         return $paths;
     }
 
+    /**
+     * Process restore data to DB.
+     * @param $data
+     * @return void
+     * @throws dml_exception
+     */
     public function process_plugin_local_assess_type_module($data) {
         global $DB;
         $table = 'local_assess_type';
@@ -50,7 +54,7 @@ class restore_local_assess_type_plugin extends restore_local_plugin {
         $r = new \stdClass();
         $r->type = $data['type'];
         $r->cmid = $this->task->get_moduleid();
-        $r->courseid =  $this->task->get_courseid();
+        $r->courseid = $this->task->get_courseid();
         $DB->insert_record($table, $r);
     }
 }
