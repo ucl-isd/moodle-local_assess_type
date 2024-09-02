@@ -43,16 +43,17 @@ class restore_local_assess_type_plugin extends restore_local_plugin {
 
     /**
      * Process restore data to DB.
-     * @param $data
+     * @param mixed $data
      * @return void
      * @throws dml_exception
      */
     public function process_plugin_local_assess_type_module($data) {
         global $DB;
+        $data = (object)$data;
         $table = 'local_assess_type';
         // Record for update/insert.
         $r = new \stdClass();
-        $r->type = $data['type'];
+        $r->type = $data->type;
         $r->cmid = $this->task->get_moduleid();
         $r->courseid = $this->task->get_courseid();
         $DB->insert_record($table, $r);
