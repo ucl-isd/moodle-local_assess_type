@@ -108,10 +108,9 @@ class assess_type {
      */
     public static function is_locked(int $cmid): bool {
         global $DB;
-        if ($r = $DB->get_record('local_assess_type', ['cmid' => $cmid])) {
-            return $r->locked;
-        }
-        return false;
+        $record = $DB->get_record('local_assess_type', ['cmid' => $cmid], 'locked');
+
+        return (bool) ($record->locked ?? false);
     }
 
     /**
