@@ -117,14 +117,15 @@ class assess_type {
     /**
      * Update the assess type.
      *
-     * @param int $cmid - The mod id.
      * @param int $courseid - The course id.
      * @param int $type - formative/summative/dummy.
+     * @param int $cmid - The mod id.
+     * @param int $gradeitemid - The grade item id.
      * @param int $locked - Lock field.
      *
      * @throws \dml_exception
      */
-    public static function update_type(int $cmid, int $courseid, int $type, int $locked = 0): void {
+    public static function update_type(int $courseid, int $type, int $cmid = 0, int $gradeitemid = 0,  int $locked = 0): void {
         global $DB;
         $table = 'local_assess_type';
 
@@ -132,12 +133,13 @@ class assess_type {
         $record = (object) [
           'type' => $type,
           'cmid' => $cmid,
+          'gradeitemid' => $gradeitemid,
           'courseid' => $courseid,
           'locked' => $locked,
         ];
 
         // Check if the record already exists.
-        $existingrecord = $DB->get_record($table, ['cmid' => $cmid], 'id, type, locked');
+        $existingrecord = $DB->get_record($table, ['cmid' => $cmid, 'gradeitemid' => $gradeitemid], 'id, type, locked');
 
         // If the record exists and has changed, update it.
         if ($existingrecord) {
@@ -150,5 +152,23 @@ class assess_type {
             // Insert a new record if it doesn't exist.
             $DB->insert_record($table, $record, false);
         }
+    }
+
+    /**
+     * Get all assess type records by course id.
+     *
+     * @param int $courseid
+     * @param int|null $type
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_assess_type_records_by_courseid(int $courseid, ?int $type = null): array {
+        global $DB;
+        $params = ['courseid' => $courseid];
+        if ($type) {
+            $params['type'] = $type;
+        }
+        return $DB->get_records('local_assess_type', $params);
     }
 }
