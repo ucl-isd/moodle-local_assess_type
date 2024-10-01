@@ -63,5 +63,20 @@ function xmldb_local_assess_type_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024091300, 'local', 'assess_type');
     }
 
+    if ($oldversion < 2024100100) {
+
+        // Define table report_feedback_tracker.
+        $table = new xmldb_table('local_assess_type');
+
+        // Conditionally add field to table.
+        $fieldname = 'partid';
+        if (!$dbman->field_exists($table, $fieldname)) {
+            $field = new xmldb_field($fieldname, XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $dbman->add_field($table, $field);
+        }
+
+        // Assess_type savepoint reached.
+        upgrade_plugin_savepoint(true, 2024100100, 'local', 'assess_type');
+    }
     return true;
 }
