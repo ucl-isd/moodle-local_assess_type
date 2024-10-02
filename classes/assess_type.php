@@ -120,25 +120,35 @@ class assess_type {
      * @param int $type - formative/summative/dummy.
      * @param int $cmid - The mod id.
      * @param int $gradeitemid - The grade item id.
+     * @param int $partid - The part id.
      * @param int $locked - Lock field.
      *
      * @throws \dml_exception
      */
-    public static function update_type(int $courseid, int $type, int $cmid = 0, int $gradeitemid = 0,  int $locked = 0): void {
+    public static function update_type(
+        int $courseid,
+        int $type,
+        int $cmid = 0,
+        null|int $partid = 0,
+        int $gradeitemid = 0,
+        int $locked = 0
+    ): void {
         global $DB;
         $table = 'local_assess_type';
 
         // Prepare the record to write.
         $record = (object) [
-          'type' => $type,
-          'cmid' => $cmid,
-          'gradeitemid' => $gradeitemid,
-          'courseid' => $courseid,
-          'locked' => $locked,
+            'type' => $type,
+            'cmid' => $cmid,
+            'partid' => $partid,
+            'gradeitemid' => $gradeitemid,
+            'courseid' => $courseid,
+            'locked' => $locked,
         ];
 
         // Check if the record already exists.
-        $existingrecord = $DB->get_record($table, ['cmid' => $cmid, 'gradeitemid' => $gradeitemid], 'id, type, locked');
+        $existingrecord = $DB->get_record($table, ['cmid' => $cmid, 'gradeitemid' => $gradeitemid, 'partid' => $partid],
+            'id, type, locked');
 
         // If the record exists and has changed, update it.
         if ($existingrecord) {
