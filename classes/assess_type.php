@@ -35,6 +35,24 @@ class assess_type {
     /** @var int Assessment type dummy */
     const ASSESS_TYPE_DUMMY = 2;
 
+
+     /**
+     * Return array of assessment types which can be summative.
+     *
+     * @param array ['quiz', 'assign' , 'foo']
+     */
+    public static function allowed_activities(): array {
+        // Activites which can be marked summative.
+        $modarray = [
+          'assign',
+          'lesson',
+          'quiz',
+          'turnitintooltwo',
+          'workshop',
+        ];
+        return $modarray;
+    }
+
     /**
      * Return if an activity can be summative.
      *
@@ -42,13 +60,7 @@ class assess_type {
      */
     public static function canbesummative(string $modtype): bool {
         // Activites which can be marked summative.
-        $modarray = [
-          'assign',
-          'quiz',
-          'workshop',
-          'turnitintooltwo',
-        ];
-
+        $modarray = self::allowed_activities();
         if (in_array($modtype, $modarray)) {
             return true;
         }
