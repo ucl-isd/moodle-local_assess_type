@@ -36,13 +36,11 @@ class assess_type {
     const ASSESS_TYPE_DUMMY = 2;
 
 
-     /**
+    /**
      * Return array of assessment types which can be summative.
      *
-     * @param array ['quiz', 'assign' , 'foo']
      */
     public static function allowed_activities(): array {
-        // Activites which can be marked summative.
         $modarray = [
           'assign',
           'lesson',
@@ -136,7 +134,7 @@ class assess_type {
      *
      * @throws \dml_exception
      */
-    public static function update_type(int $courseid, int $type, int $cmid = 0, int $gradeitemid = 0,  int $locked = 0): void {
+    public static function update_type(int $courseid, int $type, int $cmid = 0, int $gradeitemid = 0, int $locked = 0): void {
         global $DB;
         $table = 'local_assess_type';
 
