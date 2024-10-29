@@ -74,7 +74,7 @@ class assess_type {
      * @param int $cmid
      */
     public static function get_type_name(int $cmid): ?string {
-        if ($typeint = self::get_type_int($cmid)) {
+        if (($typeint = self::get_type_int($cmid)) !== null) {
             switch ($typeint) {
                 case self::ASSESS_TYPE_FORMATIVE:
                     return get_string('formative', 'local_assess_type');
