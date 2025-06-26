@@ -14,38 +14,37 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Version.
- *
- * @package    local_assess_type
- * @copyright  2024 onwards University College London {@link https://www.ucl.ac.uk/}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
- */
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/backup/moodle2/backup_local_plugin.class.php');
 
 /**
- * Database: assess_type(id, courseid, cmid, type)
- * Backup assess_type
+ * Defines backup_local_assess_type_plugin class
+ *
+ * @package    local_assess_type
+ * @copyright  2025 onwards University College London {@link https://www.ucl.ac.uk/}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  */
 class backup_local_assess_type_plugin extends backup_local_plugin {
 
-
     /**
-     * Define structure.
+     * Define course plugin structure
+     *
      * @return backup_plugin_element
      * @throws base_element_struct_exception
      */
-    protected function define_module_plugin_structure() {
+    protected function define_course_plugin_structure(): backup_plugin_element {
         $plugin = $this->get_plugin_element();
-        $pluginwrapper = new backup_nested_element($this->get_recommended_name(),
-            ['id'],
-            ['type']
-        );
-        $plugin->add_child($pluginwrapper);
-        $pluginwrapper->set_source_sql(
-            'SELECT id, type FROM {local_assess_type} WHERE cmid = :cmid AND type IS NOT NULL',
-            ['cmid' => backup::VAR_PARENTID]
-        );
+
+        $wrapper = new backup_nested_element($this->get_recommended_name());
+        $assesstypedata = new backup_nested_element('assess_type', ['id'], ['cmid', 'gradeitemid', 'type', 'locked']);
+
+        $wrapper->add_child($assesstypedata);
+        $plugin->add_child($wrapper);
+
+        // Set source table for backup.
+        $assesstypedata->set_source_table('local_assess_type', ['courseid' => backup::VAR_COURSEID]);
+
         return $plugin;
     }
 }

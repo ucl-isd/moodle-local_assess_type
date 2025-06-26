@@ -14,48 +14,86 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Version.
- *
- * @package    local_assess_type
- * @copyright  2024 onwards University College London {@link https://www.ucl.ac.uk/}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
- */
+use core_cache\request_cache;
+
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->dirroot . '/backup/moodle2/restore_local_plugin.class.php');
 
 /**
- * Database: assess_type(id, courseid, cmid, type)
- * Restore assess_type
+ * Defines restore_local_assess_type_plugin class.
+ *
+ * @package    local_assess_type
+ * @copyright  2025 onwards University College London {@link https://www.ucl.ac.uk/}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  */
 class restore_local_assess_type_plugin extends restore_local_plugin {
 
     /**
-     * Define structure.
-     * @return array
+     * Gets the cache instance for storing restore data.
+     *
+     * @return request_cache Cache instance.
      */
-    protected function define_module_plugin_structure() {
-        $paths = [];
-        // The restore_path_element needs postfix of 'process_*', path in xml.
-        $pathname = 'plugin_local_assess_type_module';
-        $paths[] = new restore_path_element($pathname, "/module/$pathname");
-        return $paths;
+    private function get_cache(): request_cache {
+        return \cache::make_from_params(\cache_store::MODE_REQUEST, 'local_assess_type', 'restore_data');
     }
 
     /**
-     * Process restore data to DB.
-     * @param mixed $data
-     * @return void
-     * @throws dml_exception
+     * Gets the cache key for the current course.
+     *
+     * @return string Cache key.
      */
-    public function process_plugin_local_assess_type_module($data) {
+    private function get_cache_key(): string {
+        return 'restore_data_' . $this->task->get_courseid();
+    }
+
+    /**
+     * Define course plugin structure.
+     *
+     * @return array Plugin structure paths.
+     */
+    protected function define_course_plugin_structure(): array {
+        return [new restore_path_element('assess_type_course', $this->get_pathfor('/assess_type'))];
+    }
+
+    /**
+     * Save the assessment type data to cache.
+     *
+     * @param mixed $data Assessment type data.
+     */
+    public function process_assess_type_course(mixed $data): void {
+        $cache = $this->get_cache();
+        $key = $this->get_cache_key();
+        $dataarray = $cache->get($key) ?: [];
+        $dataarray[] = (object)$data;
+        $cache->set($key, $dataarray);
+    }
+
+    /**
+     * Process the assessment type data after course restoration.
+     */
+    public function after_restore_course(): void {
         global $DB;
-        $data = (object)$data;
-        $table = 'local_assess_type';
-        // Record for update/insert.
-        $r = new \stdClass();
-        $r->type = $data->type;
-        $r->cmid = $this->task->get_moduleid();
-        $r->courseid = $this->task->get_courseid();
-        $DB->insert_record($table, $r);
+        $courseid = $this->task->get_courseid();
+        $dataarray = $this->get_cache()->get($this->get_cache_key());
+
+        if (empty($dataarray) || !is_array($dataarray)) {
+            return;
+        }
+
+        // Process each assessment type record.
+        foreach ($dataarray as $data) {
+            $data->courseid = $courseid;
+            $data->locked = 0;
+
+            // Map course module id if present.
+            if (!empty($data->cmid) && $newcmid = $this->get_mappingid('course_module', $data->cmid)) {
+                $data->cmid = $newcmid;
+                $DB->insert_record('local_assess_type', $data);
+            } else if (!empty($data->gradeitemid) && $newgradeitemid = $this->get_mappingid('grade_item', $data->gradeitemid)) {
+                $data->gradeitemid = $newgradeitemid;
+                $DB->insert_record('local_assess_type', $data);
+            }
+        }
     }
 }
