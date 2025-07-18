@@ -41,19 +41,16 @@ class assess_type {
      * @param string $modtype The activity type e.g. quiz.
      */
     public static function canbesummative(string $modtype): bool {
-        // Activites which can be marked summative.
-        $modarray = [
-          'assign',
-          'coursework',
-          'quiz',
-          'workshop',
-          'turnitintooltwo',
+        // Mods which can be marked summative.
+        $modules = [
+            'assign',
+            'coursework',
+            'quiz',
+            'workshop',
+            'turnitintooltwo',
         ];
 
-        if (in_array($modtype, $modarray)) {
-            return true;
-        }
-        return false;
+        return in_array($modtype, $modules);
     }
 
     /**
