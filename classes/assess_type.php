@@ -44,6 +44,7 @@ class assess_type {
         // Activites which can be marked summative.
         $modarray = [
           'assign',
+          'coursework',
           'quiz',
           'workshop',
           'turnitintooltwo',
