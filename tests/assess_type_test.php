@@ -57,15 +57,15 @@ final class assess_type_test extends \advanced_testcase {
     public static function assess_type_strings(): array {
         return [
             'formative' => [
-                'assess_type' => assess_type::ASSESS_TYPE_FORMATIVE,
+                'assesstype' => assess_type::ASSESS_TYPE_FORMATIVE,
                 'name' => get_string('formative', 'local_assess_type'),
             ],
             'summative' => [
-                'assess_type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+                'assesstype' => assess_type::ASSESS_TYPE_SUMMATIVE,
                 'name' => get_string('summative', 'local_assess_type'),
             ],
             'dummy' => [
-                'assess_type' => assess_type::ASSESS_TYPE_DUMMY,
+                'assesstype' => assess_type::ASSESS_TYPE_DUMMY,
                 'name' => get_string('dummy', 'local_assess_type'),
             ],
         ];
