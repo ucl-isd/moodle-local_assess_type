@@ -45,6 +45,7 @@ class assess_type {
         $modules = [
             'assign',
             'coursework',
+            'lti',
             'quiz',
             'workshop',
             'turnitintooltwo',
