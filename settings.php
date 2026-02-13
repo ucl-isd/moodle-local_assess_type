@@ -28,17 +28,17 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $ADMIN->add(
-      'localplugins',
-      new admin_category('local_assess_type_settings', new lang_string('pluginname', 'local_assess_type'))
+        'localplugins',
+        new admin_category('local_assess_type_settings', new lang_string('pluginname', 'local_assess_type'))
     );
     $settings = new admin_settingpage('managelocalassesstype', new lang_string('settings:pagename', 'local_assess_type'));
 
     // Setting to enable/disable the plugin.
     $settings->add(new admin_setting_configcheckbox(
-      'local_assess_type/enabled',
-      get_string('settings:enable', 'local_assess_type'),
-      get_string('settings:enable:desc', 'local_assess_type'),
-      '1'
+        'local_assess_type/enabled',
+        get_string('settings:enable', 'local_assess_type'),
+        get_string('settings:enable:desc', 'local_assess_type'),
+        '1'
     ));
 
     $ADMIN->add('localplugins', $settings);
