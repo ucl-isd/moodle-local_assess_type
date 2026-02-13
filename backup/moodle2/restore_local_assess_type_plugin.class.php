@@ -28,7 +28,6 @@ require_once($CFG->dirroot . '/backup/moodle2/restore_local_plugin.class.php');
  * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  */
 class restore_local_assess_type_plugin extends restore_local_plugin {
-
     /**
      * Gets the cache instance for storing restore data.
      *

@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/local/assess_type/backup/moodle2/restore_local_as
  * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  */
 final class restore_local_assess_type_plugin_test extends \advanced_testcase {
-
     /**
      * Test setup.
      */
@@ -50,8 +49,14 @@ final class restore_local_assess_type_plugin_test extends \advanced_testcase {
      */
     protected function create_backup_file($course): \stored_file {
         make_backup_temp_directory($course->id);
-        $bc = new \backup_controller(\backup::TYPE_1COURSE, $course->id,
-            \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, 2);
+        $bc = new \backup_controller(
+            \backup::TYPE_1COURSE,
+            $course->id,
+            \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            2
+        );
         $bc->execute_plan();
         $results = $bc->get_results();
         $bc->destroy();
@@ -95,8 +100,14 @@ final class restore_local_assess_type_plugin_test extends \advanced_testcase {
         $backuppath = $CFG->tempdir . '/backup/test_restore';
         $backupfile->extract_to_pathname(get_file_packer('application/vnd.moodle.backup'), $backuppath);
 
-        $rc = new \restore_controller('test_restore', $destcourse->id,
-            \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id, \backup::TARGET_NEW_COURSE);
+        $rc = new \restore_controller(
+            'test_restore',
+            $destcourse->id,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $USER->id,
+            \backup::TARGET_NEW_COURSE
+        );
         $rc->execute_precheck();
         $rc->execute_plan();
 

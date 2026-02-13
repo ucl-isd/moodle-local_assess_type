@@ -25,7 +25,6 @@ namespace local_assess_type;
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 class assess_type {
-
     /** @var int Assessment type formative */
     const ASSESS_TYPE_FORMATIVE = 0;
 
@@ -45,6 +44,7 @@ class assess_type {
         $modules = [
             'assign',
             'coursework',
+            'lti',
             'quiz',
             'workshop',
             'turnitintooltwo',
@@ -122,7 +122,7 @@ class assess_type {
      *
      * @throws \dml_exception
      */
-    public static function update_type(int $courseid, int $type, int $cmid = 0, int $gradeitemid = 0,  int $locked = 0): void {
+    public static function update_type(int $courseid, int $type, int $cmid = 0, int $gradeitemid = 0, int $locked = 0): void {
         global $DB;
         $table = 'local_assess_type';
 

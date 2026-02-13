@@ -26,7 +26,6 @@ require_once($CFG->dirroot . '/backup/moodle2/backup_local_plugin.class.php');
  * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  */
 class backup_local_assess_type_plugin extends backup_local_plugin {
-
     /**
      * Define course plugin structure
      *

@@ -101,10 +101,12 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
             '</a>';
     }
 
-    $info = $mform->createElement('html',
+    $info = $mform->createElement(
+        'html',
         '<div class="col-md-9 offset-md-3 pb-3">'
             . get_string('info', 'local_assess_type') . $link .
-        '</div>');
+        '</div>'
+    );
 
     // Add form elements to the dom.
     $mform->insertElementBefore($select, 'introeditor');
