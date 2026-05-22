@@ -44,20 +44,20 @@ class delete_orphan_records extends scheduled_task {
     public function execute(): void {
         global $DB;
 
-        $orphanids = [];
-
         // Find records where cmid references a deleted course module.
         $sql = "SELECT a.id
                 FROM {local_assess_type} a
                 LEFT JOIN {course_modules} cm ON cm.id = a.cmid
-                WHERE a.cmid != 0 AND cm.id IS NULL";
-        $orphanids = array_merge($orphanids, $DB->get_fieldset_sql($sql));
+                WHERE a.cmid != 0
+                AND cm.id IS NULL";
+        $orphanids = $DB->get_fieldset_sql($sql);
 
         // Find records where gradeitemid references a deleted grade item.
         $sql = "SELECT a.id
                 FROM {local_assess_type} a
                 LEFT JOIN {grade_items} gi ON gi.id = a.gradeitemid
-                WHERE a.gradeitemid != 0 AND gi.id IS NULL";
+                WHERE a.gradeitemid != 0
+                AND gi.id IS NULL";
         $orphanids = array_merge($orphanids, $DB->get_fieldset_sql($sql));
 
         if (empty($orphanids)) {

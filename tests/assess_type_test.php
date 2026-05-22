@@ -48,7 +48,6 @@ final class assess_type_test extends \advanced_testcase {
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, $course->id);
         assess_type::update_type($course->id, $assesstype, $cm->id);
         $this->assertEquals(assess_type::get_type_name($cm->id), $name);
-
     }
 
     /**

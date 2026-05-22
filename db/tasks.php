@@ -28,11 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $tasks = [
     [
         'classname' => 'local_assess_type\task\delete_orphan_records',
-        'blocking'  => 0,
-        'minute'    => '0',
-        'hour'      => '3',
-        'day'       => '*',
-        'month'     => '*',
-        'dayofweek' => '*',
+        'minute' => '0',
+        'hour'     => '3',
     ],
 ];
