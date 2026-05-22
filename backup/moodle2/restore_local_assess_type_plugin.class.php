@@ -28,6 +28,55 @@ require_once($CFG->dirroot . '/backup/moodle2/restore_local_plugin.class.php');
  * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  */
 class restore_local_assess_type_plugin extends restore_local_plugin {
+    /**
+     * Save the assessment type data to cache during course restore.
+     *
+     * @param mixed $data Assessment type data.
+     */
+    public function process_assess_type_course(mixed $data): void {
+        $this->cache_data($this->get_cache_key(), $data);
+    }
+
+    /**
+     * Save the assessment type data to cache during module restore.
+     *
+     * @param mixed $data Assessment type data.
+     */
+    public function process_assess_type_module(mixed $data): void {
+        $this->cache_data($this->get_cache_key(true), $data);
+    }
+
+    /**
+     * Process the assessment type data after course restoration.
+     */
+    public function after_restore_course(): void {
+        $this->restore_records($this->get_cache_key());
+    }
+
+    /**
+     * Process the assessment type data after module restoration (used during duplication).
+     */
+    public function after_restore_module(): void {
+        $this->restore_records($this->get_cache_key(true));
+    }
+
+    /**
+     * Define course plugin structure.
+     *
+     * @return array Plugin structure paths.
+     */
+    protected function define_course_plugin_structure(): array {
+        return [new restore_path_element('assess_type_course', $this->get_pathfor('/assess_type'))];
+    }
+
+    /**
+     * Define module plugin structure for single-activity restore (used during duplication).
+     *
+     * @return array Plugin structure paths.
+     */
+    protected function define_module_plugin_structure(): array {
+        return [new restore_path_element('assess_type_module', $this->get_pathfor('/assess_type'))];
+    }
 
     /**
      * Gets the cache instance for storing restore data.
@@ -41,59 +90,58 @@ class restore_local_assess_type_plugin extends restore_local_plugin {
     /**
      * Gets the cache key for the current course.
      *
+     * @param bool $module Whether the key is for a module-level restore.
      * @return string Cache key.
      */
-    private function get_cache_key(): string {
-        return 'restore_data_' . $this->task->get_courseid();
+    private function get_cache_key(bool $module = false): string {
+        $prefix = $module ? 'restore_data_module_' : 'restore_data_';
+        return $prefix . $this->task->get_courseid();
     }
 
     /**
-     * Define course plugin structure.
+     * Appends data to a cache key's array.
      *
-     * @return array Plugin structure paths.
+     * @param string $key Cache key.
+     * @param mixed $data Data to append.
      */
-    protected function define_course_plugin_structure(): array {
-        return [new restore_path_element('assess_type_course', $this->get_pathfor('/assess_type'))];
-    }
-
-    /**
-     * Save the assessment type data to cache.
-     *
-     * @param mixed $data Assessment type data.
-     */
-    public function process_assess_type_course(mixed $data): void {
+    private function cache_data(string $key, mixed $data): void {
         $cache = $this->get_cache();
-        $key = $this->get_cache_key();
         $dataarray = $cache->get($key) ?: [];
         $dataarray[] = (object)$data;
         $cache->set($key, $dataarray);
     }
 
     /**
-     * Process the assessment type data after course restoration.
+     * Writes cached assessment type records to the database using the given cache key.
+     *
+     * @param string $cachekey Cache key to read from.
      */
-    public function after_restore_course(): void {
+    private function restore_records(string $cachekey): void {
         global $DB;
         $courseid = $this->task->get_courseid();
-        $dataarray = $this->get_cache()->get($this->get_cache_key());
+        $dataarray = $this->get_cache()->get($cachekey);
 
         if (empty($dataarray) || !is_array($dataarray)) {
             return;
         }
 
-        // Process each assessment type record.
+        $fieldmappings = ['cmid' => 'course_module', 'gradeitemid' => 'grade_item'];
+
         foreach ($dataarray as $data) {
             $data->courseid = $courseid;
             $data->locked = 0;
 
-            // Map course module id if present.
-            if (!empty($data->cmid) && $newcmid = $this->get_mappingid('course_module', $data->cmid)) {
-                $data->cmid = $newcmid;
-                $DB->insert_record('local_assess_type', $data);
-            } else if (!empty($data->gradeitemid) && $newgradeitemid = $this->get_mappingid('grade_item', $data->gradeitemid)) {
-                $data->gradeitemid = $newgradeitemid;
-                $DB->insert_record('local_assess_type', $data);
+            foreach ($fieldmappings as $field => $mappingtype) {
+                if (!empty($data->$field) && $newid = $this->get_mappingid($mappingtype, $data->$field)) {
+                    $data->$field = $newid;
+                    if (!$DB->record_exists('local_assess_type', [$field => $newid, 'courseid' => $courseid])) {
+                        $DB->insert_record('local_assess_type', $data);
+                    }
+                    break;
+                }
             }
         }
+
+        $this->get_cache()->delete($cachekey);
     }
 }

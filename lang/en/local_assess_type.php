@@ -40,4 +40,5 @@ $string['settings:enable:desc'] = 'Enable the assessment type plugin for course 
 $string['settings:pagename'] = 'Assessment type settings';
 $string['summative'] = 'Summative';
 $string['summativeoption'] = 'Summative - counts towards the final module mark';
+$string['task:deleteorphanrecords:name'] = 'Delete orphaned assessment type records';
 $string['warning'] = 'This activity must be marked as Formative or Summative.';
