@@ -63,5 +63,22 @@ function xmldb_local_assess_type_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024091300, 'local', 'assess_type');
     }
 
+    if ($oldversion < 2026051900) {
+        $table = new xmldb_table('local_assess_type');
+
+        $index = new xmldb_index('cmid', XMLDB_INDEX_NOTUNIQUE, ['cmid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $index = new xmldb_index('gradeitemid', XMLDB_INDEX_NOTUNIQUE, ['gradeitemid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Local_assess_type savepoint reached.
+        upgrade_plugin_savepoint(true, 2026051900, 'local', 'assess_type');
+    }
+
     return true;
 }

@@ -1,0 +1,52 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+namespace local_assess_type;
+
+use core\event\course_module_deleted;
+use core\event\grade_item_deleted;
+
+/**
+ * Event observer class for local_assess_type.
+ *
+ * @package    local_assess_type
+ * @copyright  2026 onwards University College London {@link https://www.ucl.ac.uk/}
+ * @author     Alex Yeung <k.yeung@ucl.ac.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class observer {
+    /**
+     * Handle course module deleted event.
+     *
+     * @param course_module_deleted $event
+     * @return void
+     */
+    public static function course_module_deleted(course_module_deleted $event): void {
+        global $DB;
+        $DB->delete_records('local_assess_type', ['cmid' => $event->objectid]);
+    }
+
+    /**
+     * Handle grade item deleted event.
+     *
+     * @param grade_item_deleted $event
+     * @return void
+     */
+    public static function grade_item_deleted(grade_item_deleted $event): void {
+        global $DB;
+        $DB->delete_records('local_assess_type', ['gradeitemid' => $event->objectid]);
+    }
+}

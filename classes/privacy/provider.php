@@ -32,7 +32,6 @@ namespace local_assess_type\privacy;
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 class provider implements \core_privacy\local\metadata\null_provider {
-
     /**
      * Return privacy string.
      *

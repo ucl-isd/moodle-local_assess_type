@@ -15,18 +15,23 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version.
+ * Event observers for local_assess_type.
  *
  * @package    local_assess_type
- * @copyright  2024 onwards University College London {@link https://www.ucl.ac.uk/}
+ * @copyright  2026 onwards University College London {@link https://www.ucl.ac.uk/}
+ * @author     Alex Yeung <k.yeung@ucl.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_assess_type';
-$plugin->release = '1.0';
-$plugin->version = 2026051900; // YYYYMMDD.
-$plugin->requires = 2023100900;
-$plugin->maturity = MATURITY_STABLE;
+$observers = [
+    [
+        'eventname' => '\core\event\course_module_deleted',
+        'callback'  => '\local_assess_type\observer::course_module_deleted',
+    ],
+    [
+        'eventname' => '\core\event\grade_item_deleted',
+        'callback'  => '\local_assess_type\observer::grade_item_deleted',
+    ],
+];
