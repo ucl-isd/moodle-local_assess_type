@@ -33,8 +33,7 @@ class config
      * Constructor
      *
      */
-    private function __construct()
-    {
+    private function __construct() {
         $this->config = get_config('local_assess_type');
     }
 
@@ -44,8 +43,7 @@ class config
      * @param bool $forcenew
      * @return self
      */
-    public static function instance(bool $forcenew = false): self
-    {
+    public static function instance(bool $forcenew = false): self {
         static $instance;
         if (!$instance || $forcenew) {
             $instance = new static();
@@ -69,18 +67,14 @@ class config
         return array_filter(array_map('intval', explode(',', $this->config->ltitypes)));
     }
 
-    // --------------------------------------------
-    // Functions to support settings.php
-    // --------------------------------------------
-
     /**
      * Get possible LTI types
-     * @return [id => name]
+     *
+     * @return array [id => name]
      */
     public static function get_all_lti_types(): array {
         global $DB;
 
         return $DB->get_records_menu('lti_types', null, '', 'id, name');
     }
-
 }
