@@ -39,7 +39,13 @@ class assess_type {
      *
      * @param string $modtype The activity type e.g. quiz.
      */
-    public static function canbesummative(string $modtype): bool {
+    public static function canbesummative(string $modtype, int $ltitypeid = 0): bool {
+        // LTI types which can be marked summative.
+        if ($modtype == 'lti' && $ltitypeid) {
+            $ltitypes = config::instance()->get_lti_types();
+            return in_array($ltitypeid, $ltitypes);
+        }
+
         // Mods which can be marked summative.
         $modules = [
             'assign',
