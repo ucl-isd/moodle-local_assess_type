@@ -59,7 +59,7 @@ class config {
     }
 
     /**
-     * Get the list of enabled LTI ID's as an array
+     * Get the list of enabled LTI IDs as an array
      * @return int[]
      */
     public function get_lti_types(): array {

@@ -38,7 +38,7 @@ class assess_type {
      * Return if an activity can be summative.
      *
      * @param string $modtype The activity type e.g. quiz.
-     * @param int|null $ltitypeid The LTI type ID if this an LTI mod.
+     * @param int|null $ltitypeid The LTI type ID if this is an LTI mod.
      * @return bool
      */
     public static function canbesummative(string $modtype, ?int $ltitypeid = null): bool {
