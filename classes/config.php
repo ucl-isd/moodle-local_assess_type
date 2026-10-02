@@ -65,15 +65,4 @@ class config {
     public function get_lti_types(): array {
         return array_filter(array_map('intval', explode(',', ($this->config->ltitypes ?? ''))));
     }
-
-    /**
-     * Get possible LTI types
-     *
-     * @return array [id => name]
-     */
-    public static function get_all_lti_types(): array {
-        global $DB;
-
-        return $DB->get_records_menu('lti_types', null, '', 'id, name');
-    }
 }

@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_assess_type';
 $plugin->release = '1.0';
-$plugin->version = 2026090800; // YYYYMMDD.
+$plugin->version = 2026100200; // YYYYMMDD.
 $plugin->requires = 2023100900;
 $plugin->maturity = MATURITY_STABLE;

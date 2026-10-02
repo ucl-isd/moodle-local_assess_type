@@ -24,6 +24,8 @@
  * @author      Alex Yeung <k.yeung@ucl.ac.uk>
  */
 
+use local_assess_type\settings\admin_setting_configlti;
+
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
@@ -42,12 +44,12 @@ if ($hassiteconfig) {
     ));
 
     // LTI types that can be identified as summative.
-    $settings->add(new admin_setting_configmultiselect(
+    $settings->add(new admin_setting_configlti(
         'local_assess_type/ltitypes',
         get_string('config:ltitypes', 'local_assess_type'),
         get_string('config:ltitypes:desc', 'local_assess_type'),
-        [],
-        \local_assess_type\config::get_all_lti_types()
+        null,
+        null
     ));
 
     $ADMIN->add('localplugins', $settings);

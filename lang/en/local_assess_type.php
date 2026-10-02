@@ -35,6 +35,7 @@ $string['fieldlabel'] = 'Formative or summative?';
 $string['formative'] = 'Formative';
 $string['formativeoption'] = 'Formative - does not contribute to course mark';
 $string['info'] = 'Summative activities can be mapped to SITS for transferring marks.';
+$string['placeholder'] = 'Type to search';
 $string['pluginname'] = 'Assessment type';
 $string['privacy:metadata'] = 'Assessment type does not store any personal data.';
 $string['settings:enable'] = 'Enable assessment type plugin';
