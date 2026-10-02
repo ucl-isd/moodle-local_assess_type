@@ -76,7 +76,7 @@ class admin_setting_configlti extends admin_setting_configselect_autocomplete {
     }
 
     /**
-     * Display the LTI version inhuman readable format.
+     * Display the LTI version in human-readable format.
      *
      * @param string $ltiversion the LTI version     *
      * @return string
