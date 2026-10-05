@@ -151,6 +151,10 @@ class admin_setting_configlti extends admin_setting_configselect_autocomplete {
      * @return string
      */
     public function write_setting($data): string {
+        if (!is_array($data)) {
+            return ''; // Ignore it.
+        }
+
         if (!$this->load_choices() || empty($this->choices)) {
             return '';
         }
@@ -158,14 +162,14 @@ class admin_setting_configlti extends admin_setting_configselect_autocomplete {
         // Dummy value set in core/form_autocomplete_input template used as a partial.
         unset($data['xxxxx']);
 
-        $data = implode(',', $data);
-
-        // Validate the new setting.
-        $error = $this->validate_setting($data);
-        if ($error) {
-            return $error;
+        $save = [];
+        foreach ($data as $value) {
+            if (!array_key_exists($value, $this->choices)) {
+                continue; // Ignore it.
+            }
+            $save[] = $value;
         }
 
-        return ($this->config_write($this->name, $data) ? '' : get_string('errorsetting', 'admin'));
+        return ($this->config_write($this->name, implode(',', $save)) ? '' : get_string('errorsetting', 'admin'));
     }
 }
