@@ -63,18 +63,6 @@ class config {
      * @return int[]
      */
     public function get_lti_types(): array {
-        // Get the config setting.
-        $ltitypeids = $this->config->ltitypes ?? '';
-        $ltitypeids = explode(',', $ltitypeids);
-        $include = [];
-        // Explode each setting to get the instances.
-        foreach ($ltitypeids as $ltitypeid) {
-            $instances = explode('_', $ltitypeid);
-            foreach ($instances as $instance) {
-                $include[$instance] = $instance;
-            }
-        }
-
-        return $include;
+        return array_filter(explode(',', ($this->config->ltitypes ?? '')));
     }
 }

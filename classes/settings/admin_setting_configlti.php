@@ -84,7 +84,7 @@ class admin_setting_configlti extends admin_setting_configselect_autocomplete {
     public function display_version(string $ltiversion): string {
         if ($ltiversion == 'LTI-1p0') {
             $ltiversion = 'LTI-1';
-        } else if (strpos($ltiversion, '1.3') !== true) {
+        } else if (str_contains($ltiversion, '1p3') || str_contains($ltiversion, '1.3')) {
             $ltiversion = 'LTI-3';
         } else {
             $ltiversion = 'No LTI version';

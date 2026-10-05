@@ -44,7 +44,7 @@ class assess_type {
     public static function canbesummative(string $modtype, ?int $ltitypeid = null): bool {
         // LTI types which can be marked summative.
         if ($modtype == 'lti' && $ltitypeid) {
-            $ltitypes = config::instance()->get_lti_types();
+            $ltitypes = self::get_lti_types();
             return in_array($ltitypeid, $ltitypes);
         }
 
@@ -174,5 +174,24 @@ class assess_type {
             $params['type'] = $type;
         }
         return $DB->get_records('local_assess_type', $params);
+    }
+
+    /**
+     * Get the list of enabled LTI IDs as an array
+     * @return int[]
+     */
+    public static function get_lti_types(): array {
+        // Get the config setting.
+        $ltitypes = config::instance()->get_lti_types() ?? '';
+        $include = [];
+        // Explode each setting to get the instances.
+        foreach ($ltitypes as $ltitypestring) {
+            $ltitypeids = explode('_', $ltitypestring);
+            foreach ($ltitypeids as $ltitypeid) {
+                $include[$ltitypeid] = $ltitypeid;
+            }
+        }
+
+        return $include;
     }
 }

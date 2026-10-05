@@ -56,3 +56,15 @@ Feature: LTI activities can be marked as summative
     And I am on "Course 1" course homepage
     And I add a "Course tool 3" to section "1" using the activity chooser
     And "Formative or summative?" "field" should exist
+
+  Scenario: User can select multiple LTI types that can be marked as summative
+    Given I log in as "admin"
+    And I navigate to "Plugins > Local > Assessment type settings" in site administration
+    And I open the autocomplete suggestions list
+    And I click on "example.com LTI-1 (1)" item in the autocomplete list
+    And I click on "another.example.com LTI-1 (2)" item in the autocomplete list
+    And "example.com LTI-1 (1)" "autocomplete_selection" should exist
+    And "another.example.com LTI-1 (2)" "autocomplete_selection" should exist
+    And I press "Save changes"
+    And "example.com LTI-1 (1)" "autocomplete_selection" should exist
+    And "another.example.com LTI-1 (2)" "autocomplete_selection" should exist
