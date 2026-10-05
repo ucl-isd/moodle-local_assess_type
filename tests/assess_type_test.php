@@ -59,7 +59,7 @@ final class assess_type_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         set_config('enabled', 1, 'local_assess_type');
-        set_config('ltitypes', '42,99', 'local_assess_type');
+        set_config('ltitypes', '42_5,99', 'local_assess_type');
         config::instance(true);
 
         $this->assertTrue(assess_type::canbesummative('lti', 42));
