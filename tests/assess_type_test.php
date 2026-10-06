@@ -69,4 +69,89 @@ final class assess_type_test extends \advanced_testcase {
             ],
         ];
     }
+
+    /**
+     * Bulk lookups retain the course and assessment-type filters.
+     *
+     * @covers \local_assess_type\assess_type::get_assess_type_records_by_courseids
+     */
+    public function test_get_assess_type_records_by_courseids(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $firstcourse = $this->getDataGenerator()->create_course();
+        $secondcourse = $this->getDataGenerator()->create_course();
+        $thirdcourse = $this->getDataGenerator()->create_course();
+
+        $firstid = $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $firstcourse->id,
+            'cmid' => 1,
+            'gradeitemid' => 0,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+            'locked' => 0,
+        ]);
+        $secondid = $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $secondcourse->id,
+            'cmid' => 2,
+            'gradeitemid' => 0,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+            'locked' => 0,
+        ]);
+        foreach ([$firstcourse, $thirdcourse] as $course) {
+            $DB->insert_record('local_assess_type', (object)[
+                'courseid' => $course->id,
+                'cmid' => 3,
+                'gradeitemid' => 0,
+                'type' => assess_type::ASSESS_TYPE_FORMATIVE,
+                'locked' => 0,
+            ]);
+        }
+
+        $records = assess_type::get_assess_type_records_by_courseids(
+            [$firstcourse->id, $secondcourse->id],
+            assess_type::ASSESS_TYPE_SUMMATIVE
+        );
+        $this->assertEqualsCanonicalizing([$firstid], array_keys($records[$firstcourse->id]));
+        $this->assertEqualsCanonicalizing([$secondid], array_keys($records[$secondcourse->id]));
+        $this->assertSame([], assess_type::get_assess_type_records_by_courseids([]));
+    }
+
+    /**
+     * Existing sites receive the new course/type lookup index on upgrade.
+     *
+     * @coversNothing
+     */
+    public function test_course_type_index_upgrade(): void {
+        global $CFG, $DB;
+
+        require_once($CFG->libdir . '/upgradelib.php');
+        require_once($CFG->dirroot . '/local/assess_type/db/upgrade.php');
+        $this->resetAfterTest();
+
+        $dbman = $DB->get_manager();
+        $table = new \xmldb_table('local_assess_type');
+        $index = new \xmldb_index('courseid-type', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'type']);
+        $currentversion = (int)get_config('local_assess_type', 'version');
+        $oldversion = 2026051900;
+        $this->assertTrue($dbman->table_exists($table));
+        $hadindex = $dbman->index_exists($table, $index);
+
+        if ($hadindex) {
+            $dbman->drop_index($table, $index);
+        }
+        set_config('version', $oldversion, 'local_assess_type');
+        try {
+            $this->assertFalse($dbman->index_exists($table, $index));
+            $this->assertTrue(xmldb_local_assess_type_upgrade($oldversion));
+            $this->assertTrue($dbman->index_exists($table, $index));
+            $this->assertSame(2026100600, (int)get_config('local_assess_type', 'version'));
+        } finally {
+            if ($hadindex && !$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            } else if (!$hadindex && $dbman->index_exists($table, $index)) {
+                $dbman->drop_index($table, $index);
+            }
+            set_config('version', $currentversion, 'local_assess_type');
+        }
+    }
 }
