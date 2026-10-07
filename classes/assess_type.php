@@ -167,4 +167,35 @@ class assess_type {
         }
         return $DB->get_records('local_assess_type', $params);
     }
+
+    /**
+     * Get assessment type records for several courses without one query per course.
+     *
+     * @param int[] $courseids
+     * @param int|null $type
+     * @return array Records grouped by course id.
+     */
+    public static function get_assess_type_records_by_courseids(array $courseids, ?int $type = null): array {
+        global $DB;
+
+        $courseids = array_values(array_unique(array_map('intval', $courseids)));
+        if (!$courseids) {
+            return [];
+        }
+
+        $recordsbycourse = [];
+        foreach (array_chunk($courseids, 500) as $chunk) {
+            [$coursesql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'courseid');
+            $sql = "SELECT * FROM {local_assess_type} WHERE courseid $coursesql";
+            if ($type !== null) {
+                $sql .= ' AND type = :type';
+                $params['type'] = $type;
+            }
+            foreach ($DB->get_records_sql($sql, $params) as $record) {
+                $recordsbycourse[(int)$record->courseid][$record->id] = $record;
+            }
+        }
+
+        return $recordsbycourse;
+    }
 }
