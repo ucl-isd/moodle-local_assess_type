@@ -20,10 +20,10 @@ Feature: LTI activities can be marked as summative
       | Course tool 2 | https://another.example.com/tool | C1     |
       | Course tool 3 | https://another.example.com/tool | C1     |
 
-  Scenario: Admin can select LTI types that can be marked as summative
+  Scenario: Admin can select LTI Tool URLs that can be marked as summative
     When I log in as "admin"
     And I navigate to "Plugins > Local > Assessment type settings" in site administration
-    Then "LTI Types" "field" should exist
+    Then "LTI Tool URLs" "field" should exist
     And I open the autocomplete suggestions list
     And I should see "another.example.com LTI-1 (2)" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "example.com LTI-1 (1)" in the ".form-autocomplete-suggestions" "css_element"
@@ -43,7 +43,7 @@ Feature: LTI activities can be marked as summative
   Scenario: User can mark an LTI activity as summative if it has been configured to allow this
     Given I log in as "admin"
     And I navigate to "Plugins > Local > Assessment type settings" in site administration
-    And I set the field "LTI Types" to "another.example.com LTI-1 (2)"
+    And I set the field "LTI Tool URLs" to "another.example.com LTI-1 (2)"
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
@@ -57,7 +57,7 @@ Feature: LTI activities can be marked as summative
     And I add a "Course tool 3" to section "1" using the activity chooser
     And "Formative or summative?" "field" should exist
 
-  Scenario: User can select multiple LTI types that can be marked as summative
+  Scenario: User can select multiple LTI Tool URLs that can be marked as summative
     Given I log in as "admin"
     And I navigate to "Plugins > Local > Assessment type settings" in site administration
     And I open the autocomplete suggestions list
