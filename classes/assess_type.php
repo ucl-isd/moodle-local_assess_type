@@ -205,7 +205,7 @@ class assess_type {
     public static function get_assess_type_records_by_courseids(array $courseids, ?int $type = null): array {
         global $DB;
 
-        $courseids = array_values(array_unique(array_map('intval', $courseids)));
+        $courseids = array_unique($courseids);
         if (!$courseids) {
             return [];
         }
