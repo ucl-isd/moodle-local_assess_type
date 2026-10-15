@@ -135,6 +135,55 @@ final class assess_type_test extends \advanced_testcase {
     }
 
     /**
+     * Bulk module lookup returns only existing, visible modules of the requested type and course.
+     *
+     * @covers \local_assess_type\assess_type::get_cmids_for_courses_by_type
+     */
+    public function test_get_cmids_for_courses_by_type(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $firstcourse = $this->getDataGenerator()->create_course();
+        $secondcourse = $this->getDataGenerator()->create_course();
+        $firstassign = $this->getDataGenerator()->create_module('assign', ['course' => $firstcourse->id]);
+        $secondassign = $this->getDataGenerator()->create_module('assign', ['course' => $secondcourse->id]);
+        $hiddenassign = $this->getDataGenerator()->create_module('assign', ['course' => $firstcourse->id]);
+        $formativeassign = $this->getDataGenerator()->create_module('assign', ['course' => $firstcourse->id]);
+        $firstcm = get_coursemodule_from_instance('assign', $firstassign->id, $firstcourse->id);
+        $secondcm = get_coursemodule_from_instance('assign', $secondassign->id, $secondcourse->id);
+        $hiddencm = get_coursemodule_from_instance('assign', $hiddenassign->id, $firstcourse->id);
+        $formativecm = get_coursemodule_from_instance('assign', $formativeassign->id, $firstcourse->id);
+
+        assess_type::update_type($firstcourse->id, assess_type::ASSESS_TYPE_SUMMATIVE, $firstcm->id);
+        assess_type::update_type($secondcourse->id, assess_type::ASSESS_TYPE_SUMMATIVE, $secondcm->id);
+        assess_type::update_type($firstcourse->id, assess_type::ASSESS_TYPE_SUMMATIVE, $hiddencm->id);
+        assess_type::update_type($firstcourse->id, assess_type::ASSESS_TYPE_FORMATIVE, $formativecm->id);
+        $DB->set_field('course_modules', 'visible', 0, ['id' => $hiddencm->id]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $firstcourse->id,
+            'cmid' => $secondcm->id,
+            'gradeitemid' => 0,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+            'locked' => 0,
+        ]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $firstcourse->id,
+            'cmid' => 999999999,
+            'gradeitemid' => 0,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+            'locked' => 0,
+        ]);
+
+        $records = assess_type::get_cmids_for_courses_by_type(
+            [$firstcourse->id, $secondcourse->id, $firstcourse->id],
+            assess_type::ASSESS_TYPE_SUMMATIVE
+        );
+        $this->assertCount(2, $records);
+        $this->assertEqualsCanonicalizing([$firstcm->id, $secondcm->id], array_column($records, 'cmid'));
+        $this->assertSame([], assess_type::get_cmids_for_courses_by_type([], assess_type::ASSESS_TYPE_SUMMATIVE));
+    }
+
+    /**
      * Existing sites receive the new course/type lookup index on upgrade.
      *
      * @coversNothing
