@@ -194,4 +194,64 @@ class assess_type {
 
         return $include;
     }
+
+    /**
+     * Get assessment type records for several courses without one query per course.
+     *
+     * @param int[] $courseids
+     * @param int|null $type
+     * @return array Records grouped by course id.
+     */
+    public static function get_assess_type_records_by_courseids(array $courseids, ?int $type = null): array {
+        global $DB;
+
+        $courseids = array_unique($courseids);
+        if (!$courseids) {
+            return [];
+        }
+
+        $recordsbycourse = [];
+        foreach (array_chunk($courseids, 500) as $chunk) {
+            [$coursesql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'courseid');
+            $sql = "SELECT * FROM {local_assess_type} WHERE courseid $coursesql";
+            if ($type !== null) {
+                $sql .= ' AND type = :type';
+                $params['type'] = $type;
+            }
+            foreach ($DB->get_records_sql($sql, $params) as $record) {
+                $recordsbycourse[(int)$record->courseid][$record->id] = $record;
+            }
+        }
+
+        return $recordsbycourse;
+    }
+
+    /**
+     * Get visible course modules of an assessment type across courses.
+     *
+     * @param int[] $courseids Course IDs.
+     * @param int $type Assessment type.
+     * @return array Records keyed by assessment type record ID, with courseid and cmid fields.
+     */
+    public static function get_cmids_for_courses_by_type(array $courseids, int $type): array {
+        global $DB;
+
+        $courseids = array_unique($courseids);
+        if (!$courseids) {
+            return [];
+        }
+
+        $records = [];
+        foreach (array_chunk($courseids, 500) as $chunk) {
+            [$coursesql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'courseid');
+            $params['type'] = $type;
+            $sql = "SELECT ast.id, ast.courseid, ast.cmid
+                      FROM {local_assess_type} ast
+                      JOIN {course_modules} cm ON cm.id = ast.cmid AND cm.course = ast.courseid
+                     WHERE ast.courseid $coursesql AND ast.type = :type AND cm.visible = 1";
+            $records += $DB->get_records_sql($sql, $params);
+        }
+
+        return $records;
+    }
 }
