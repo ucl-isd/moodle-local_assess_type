@@ -210,17 +210,16 @@ class assess_type {
             return [];
         }
 
+        [$coursesql, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'courseid');
+        $sql = "SELECT * FROM {local_assess_type} WHERE courseid $coursesql";
+        if ($type !== null) {
+            $sql .= ' AND type = :type';
+            $params['type'] = $type;
+        }
+
         $recordsbycourse = [];
-        foreach (array_chunk($courseids, 500) as $chunk) {
-            [$coursesql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'courseid');
-            $sql = "SELECT * FROM {local_assess_type} WHERE courseid $coursesql";
-            if ($type !== null) {
-                $sql .= ' AND type = :type';
-                $params['type'] = $type;
-            }
-            foreach ($DB->get_records_sql($sql, $params) as $record) {
-                $recordsbycourse[(int)$record->courseid][$record->id] = $record;
-            }
+        foreach ($DB->get_records_sql($sql, $params) as $record) {
+            $recordsbycourse[(int)$record->courseid][$record->id] = $record;
         }
 
         return $recordsbycourse;
@@ -241,17 +240,12 @@ class assess_type {
             return [];
         }
 
-        $records = [];
-        foreach (array_chunk($courseids, 500) as $chunk) {
-            [$coursesql, $params] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED, 'courseid');
-            $params['type'] = $type;
-            $sql = "SELECT ast.id, ast.courseid, ast.cmid
+        [$coursesql, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'courseid');
+        $params['type'] = $type;
+        $sql = "SELECT ast.id, ast.courseid, ast.cmid
                       FROM {local_assess_type} ast
                       JOIN {course_modules} cm ON cm.id = ast.cmid AND cm.course = ast.courseid
                      WHERE ast.courseid $coursesql AND ast.type = :type AND cm.visible = 1";
-            $records += $DB->get_records_sql($sql, $params);
-        }
-
-        return $records;
+        return $DB->get_records_sql($sql, $params);
     }
 }
