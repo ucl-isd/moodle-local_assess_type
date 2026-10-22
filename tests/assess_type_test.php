@@ -129,8 +129,8 @@ final class assess_type_test extends \advanced_testcase {
             [$course1->id, $course2->id],
             assess_type::ASSESS_TYPE_SUMMATIVE
         );
-        $this->assertEqualsCanonicalizing([$firstid], array_keys($records[$course1->id]));
-        $this->assertEqualsCanonicalizing([$secondid], array_keys($records[$course2->id]));
+        $this->assertEquals([$firstid], array_keys($records[$course1->id]));
+        $this->assertEquals([$secondid], array_keys($records[$course2->id]));
         $this->assertSame([], assess_type::get_assess_type_records_by_courseids([]));
     }
 
