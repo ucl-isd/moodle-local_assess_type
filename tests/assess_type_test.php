@@ -184,34 +184,35 @@ final class assess_type_test extends \advanced_testcase {
     }
 
     /**
-     * Existing sites receive the new course/type lookup index on upgrade.
+     * Existing sites lose the unused course/type lookup index on upgrade.
      *
      * @coversNothing
      */
-    public function test_course_type_index_upgrade(): void {
+    public function test_course_type_index_removed_on_upgrade(): void {
         global $CFG, $DB;
 
         require_once($CFG->libdir . '/upgradelib.php');
         require_once($CFG->dirroot . '/local/assess_type/db/upgrade.php');
         $this->resetAfterTest();
+        $this->preventResetByRollback();
 
         $dbman = $DB->get_manager();
         $table = new \xmldb_table('local_assess_type');
         $index = new \xmldb_index('courseid-type', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'type']);
         $currentversion = (int)get_config('local_assess_type', 'version');
-        $oldversion = 2026051900;
+        $oldversion = 2026100600;
         $this->assertTrue($dbman->table_exists($table));
         $hadindex = $dbman->index_exists($table, $index);
 
-        if ($hadindex) {
-            $dbman->drop_index($table, $index);
+        if (!$hadindex) {
+            $dbman->add_index($table, $index);
         }
         set_config('version', $oldversion, 'local_assess_type');
         try {
-            $this->assertFalse($dbman->index_exists($table, $index));
-            $this->assertTrue(xmldb_local_assess_type_upgrade($oldversion));
             $this->assertTrue($dbman->index_exists($table, $index));
-            $this->assertSame(2026100600, (int)get_config('local_assess_type', 'version'));
+            $this->assertTrue(xmldb_local_assess_type_upgrade($oldversion));
+            $this->assertFalse($dbman->index_exists($table, $index));
+            $this->assertSame(2026102200, (int)get_config('local_assess_type', 'version'));
         } finally {
             if ($hadindex && !$dbman->index_exists($table, $index)) {
                 $dbman->add_index($table, $index);

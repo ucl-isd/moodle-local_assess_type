@@ -80,14 +80,14 @@ function xmldb_local_assess_type_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026051900, 'local', 'assess_type');
     }
 
-    if ($oldversion < 2026100600) {
+    if ($oldversion < 2026102200) {
         $table = new xmldb_table('local_assess_type');
         $index = new xmldb_index('courseid-type', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'type']);
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2026100600, 'local', 'assess_type');
+        upgrade_plugin_savepoint(true, 2026102200, 'local', 'assess_type');
     }
 
     return true;
