@@ -87,4 +87,134 @@ final class assess_type_test extends \advanced_testcase {
             ],
         ];
     }
+
+    /**
+     * Bulk lookups retain the course and assessment-type filters.
+     *
+     * @covers \local_assess_type\assess_type::get_assess_type_records_by_courseids
+     */
+    public function test_get_assess_type_records_by_courseids(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+
+        $firstid = $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course1->id,
+            'cmid' => 1,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+        ]);
+        $secondid = $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course2->id,
+            'cmid' => 2,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+        ]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course1->id,
+            'cmid' => 3,
+            'type' => assess_type::ASSESS_TYPE_FORMATIVE,
+        ]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course3->id,
+            'cmid' => 4,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+        ]);
+
+        $records = assess_type::get_assess_type_records_by_courseids(
+            [$course1->id, $course2->id],
+            assess_type::ASSESS_TYPE_SUMMATIVE
+        );
+        $this->assertEquals([$firstid], array_keys($records[$course1->id]));
+        $this->assertEquals([$secondid], array_keys($records[$course2->id]));
+        $this->assertCount(2, $records);
+        $this->assertSame([], assess_type::get_assess_type_records_by_courseids([]));
+    }
+
+    /**
+     * Bulk module lookup returns only existing, visible modules of the requested type and course.
+     *
+     * @covers \local_assess_type\assess_type::get_cmids_for_courses_by_type
+     */
+    public function test_get_cmids_for_courses_by_type(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $assign1 = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id]);
+        $assign2 = $this->getDataGenerator()->create_module('assign', ['course' => $course2->id]);
+        $hiddenassign = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id]);
+        $formativeassign = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id]);
+        $cm1 = get_coursemodule_from_instance('assign', $assign1->id, $course1->id);
+        $cm2 = get_coursemodule_from_instance('assign', $assign2->id, $course2->id);
+        $hiddencm = get_coursemodule_from_instance('assign', $hiddenassign->id, $course1->id);
+        $formativecm = get_coursemodule_from_instance('assign', $formativeassign->id, $course1->id);
+
+        assess_type::update_type($course1->id, assess_type::ASSESS_TYPE_SUMMATIVE, $cm1->id);
+        assess_type::update_type($course2->id, assess_type::ASSESS_TYPE_SUMMATIVE, $cm2->id);
+        assess_type::update_type($course1->id, assess_type::ASSESS_TYPE_SUMMATIVE, $hiddencm->id);
+        assess_type::update_type($course1->id, assess_type::ASSESS_TYPE_FORMATIVE, $formativecm->id);
+        $DB->set_field('course_modules', 'visible', 0, ['id' => $hiddencm->id]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course1->id,
+            'cmid' => $cm2->id,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+        ]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course1->id,
+            'cmid' => 999999999,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+        ]);
+
+        // Deliberately includes a duplicate course ID.
+        $records = assess_type::get_cmids_for_courses_by_type(
+            [$course1->id, $course2->id, $course1->id],
+            assess_type::ASSESS_TYPE_SUMMATIVE
+        );
+        $this->assertCount(2, $records);
+        $this->assertEqualsCanonicalizing([$cm1->id, $cm2->id], array_column($records, 'cmid'));
+        $this->assertSame([], assess_type::get_cmids_for_courses_by_type([], assess_type::ASSESS_TYPE_SUMMATIVE));
+    }
+
+    /**
+     * Existing sites lose the unused course/type lookup index on upgrade.
+     *
+     * @coversNothing
+     */
+    public function test_course_type_index_removed_on_upgrade(): void {
+        global $CFG, $DB;
+
+        require_once($CFG->libdir . '/upgradelib.php');
+        require_once($CFG->dirroot . '/local/assess_type/db/upgrade.php');
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        $dbman = $DB->get_manager();
+        $table = new \xmldb_table('local_assess_type');
+        $index = new \xmldb_index('courseid-type', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'type']);
+        $currentversion = (int)get_config('local_assess_type', 'version');
+        $oldversion = 2026100600;
+        $this->assertTrue($dbman->table_exists($table));
+        $hadindex = $dbman->index_exists($table, $index);
+
+        if (!$hadindex) {
+            $dbman->add_index($table, $index);
+        }
+        set_config('version', $oldversion, 'local_assess_type');
+        try {
+            $this->assertTrue($dbman->index_exists($table, $index));
+            $this->assertTrue(xmldb_local_assess_type_upgrade($oldversion));
+            $this->assertFalse($dbman->index_exists($table, $index));
+            $this->assertSame(2026102200, (int)get_config('local_assess_type', 'version'));
+        } finally {
+            if ($hadindex && !$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            } else if (!$hadindex && $dbman->index_exists($table, $index)) {
+                $dbman->drop_index($table, $index);
+            }
+            set_config('version', $currentversion, 'local_assess_type');
+        }
+    }
 }
