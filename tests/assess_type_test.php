@@ -111,6 +111,7 @@ final class assess_type_test extends \advanced_testcase {
             'cmid' => 2,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
         ]);
+        // Duplicate cmid should not normally occur, but the database currently allows it.
         foreach ([$course1, $course3] as $course) {
             $DB->insert_record('local_assess_type', (object)[
                 'courseid' => $course->id,
