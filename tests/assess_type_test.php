@@ -97,25 +97,25 @@ final class assess_type_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
-        $firstcourse = $this->getDataGenerator()->create_course();
-        $secondcourse = $this->getDataGenerator()->create_course();
-        $thirdcourse = $this->getDataGenerator()->create_course();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
 
         $firstid = $DB->insert_record('local_assess_type', (object)[
-            'courseid' => $firstcourse->id,
+            'courseid' => $course1->id,
             'cmid' => 1,
             'gradeitemid' => 0,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
             'locked' => 0,
         ]);
         $secondid = $DB->insert_record('local_assess_type', (object)[
-            'courseid' => $secondcourse->id,
+            'courseid' => $course2->id,
             'cmid' => 2,
             'gradeitemid' => 0,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
             'locked' => 0,
         ]);
-        foreach ([$firstcourse, $thirdcourse] as $course) {
+        foreach ([$course1, $course3] as $course) {
             $DB->insert_record('local_assess_type', (object)[
                 'courseid' => $course->id,
                 'cmid' => 3,
@@ -126,11 +126,11 @@ final class assess_type_test extends \advanced_testcase {
         }
 
         $records = assess_type::get_assess_type_records_by_courseids(
-            [$firstcourse->id, $secondcourse->id],
+            [$course1->id, $course2->id],
             assess_type::ASSESS_TYPE_SUMMATIVE
         );
-        $this->assertEqualsCanonicalizing([$firstid], array_keys($records[$firstcourse->id]));
-        $this->assertEqualsCanonicalizing([$secondid], array_keys($records[$secondcourse->id]));
+        $this->assertEqualsCanonicalizing([$firstid], array_keys($records[$course1->id]));
+        $this->assertEqualsCanonicalizing([$secondid], array_keys($records[$course2->id]));
         $this->assertSame([], assess_type::get_assess_type_records_by_courseids([]));
     }
 
