@@ -111,14 +111,16 @@ final class assess_type_test extends \advanced_testcase {
             'cmid' => 2,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
         ]);
-        // Duplicate cmid should not normally occur, but the database currently allows it.
-        foreach ([$course1, $course3] as $course) {
-            $DB->insert_record('local_assess_type', (object)[
-                'courseid' => $course->id,
-                'cmid' => 3,
-                'type' => assess_type::ASSESS_TYPE_FORMATIVE,
-            ]);
-        }
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course1->id,
+            'cmid' => 3,
+            'type' => assess_type::ASSESS_TYPE_FORMATIVE,
+        ]);
+        $DB->insert_record('local_assess_type', (object)[
+            'courseid' => $course3->id,
+            'cmid' => 4,
+            'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
+        ]);
 
         $records = assess_type::get_assess_type_records_by_courseids(
             [$course1->id, $course2->id],
@@ -126,6 +128,7 @@ final class assess_type_test extends \advanced_testcase {
         );
         $this->assertEquals([$firstid], array_keys($records[$course1->id]));
         $this->assertEquals([$secondid], array_keys($records[$course2->id]));
+        $this->assertCount(2, $records);
         $this->assertSame([], assess_type::get_assess_type_records_by_courseids([]));
     }
 
