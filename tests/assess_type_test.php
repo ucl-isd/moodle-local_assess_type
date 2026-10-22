@@ -104,24 +104,18 @@ final class assess_type_test extends \advanced_testcase {
         $firstid = $DB->insert_record('local_assess_type', (object)[
             'courseid' => $course1->id,
             'cmid' => 1,
-            'gradeitemid' => 0,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
-            'locked' => 0,
         ]);
         $secondid = $DB->insert_record('local_assess_type', (object)[
             'courseid' => $course2->id,
             'cmid' => 2,
-            'gradeitemid' => 0,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
-            'locked' => 0,
         ]);
         foreach ([$course1, $course3] as $course) {
             $DB->insert_record('local_assess_type', (object)[
                 'courseid' => $course->id,
                 'cmid' => 3,
-                'gradeitemid' => 0,
                 'type' => assess_type::ASSESS_TYPE_FORMATIVE,
-                'locked' => 0,
             ]);
         }
 
@@ -162,16 +156,12 @@ final class assess_type_test extends \advanced_testcase {
         $DB->insert_record('local_assess_type', (object)[
             'courseid' => $course1->id,
             'cmid' => $cm2->id,
-            'gradeitemid' => 0,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
-            'locked' => 0,
         ]);
         $DB->insert_record('local_assess_type', (object)[
             'courseid' => $course1->id,
             'cmid' => 999999999,
-            'gradeitemid' => 0,
             'type' => assess_type::ASSESS_TYPE_SUMMATIVE,
-            'locked' => 0,
         ]);
 
         // Deliberately includes a duplicate course ID.
