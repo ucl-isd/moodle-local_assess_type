@@ -174,6 +174,7 @@ final class assess_type_test extends \advanced_testcase {
             'locked' => 0,
         ]);
 
+        // Deliberately includes a duplicate course ID.
         $records = assess_type::get_cmids_for_courses_by_type(
             [$course1->id, $course2->id, $course1->id],
             assess_type::ASSESS_TYPE_SUMMATIVE
