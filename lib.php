@@ -35,6 +35,11 @@ use local_assess_type\assess_type;
 function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) {
     global $DB;
 
+    // Do not add this required field during Behat runs, where it can block unrelated activity form tests.
+    if (defined('BEHAT_SITE_RUNNING')) {
+        return;
+    }
+
     // Do not show assessment type options in activity's editing page if not enabled.
     if (!get_config('local_assess_type', 'enabled')) {
         return;
