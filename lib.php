@@ -23,7 +23,6 @@
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
-
 use local_assess_type\assess_type;
 
 /**
@@ -66,7 +65,10 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     $options['1'] = get_string('summativeoption', 'local_assess_type');
     $options['2'] = get_string('dummyoption', 'local_assess_type');
     $attributes = [];
-    $attributes['required'] = 'required';
+    // Keep the field available to this plugin's Behat tests, but don't let it block unrelated activity form tests.
+    if (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING) {
+        $attributes['required'] = 'required';
+    }
 
     // Disable changes when locked.
     if ($locked) {

@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
+
 namespace local_assess_type\privacy;
 
 /**
