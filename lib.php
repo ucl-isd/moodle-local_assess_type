@@ -66,7 +66,7 @@ function local_assess_type_coursemodule_standard_elements($formwrapper, $mform) 
     $options['2'] = get_string('dummyoption', 'local_assess_type');
     $attributes = [];
     // Keep the field available to this plugin's Behat tests, but don't let it block unrelated activity form tests.
-    if (!defined('BEHAT_SITE_RUNNING')) {
+    if (!defined('BEHAT_SITE_RUNNING') || !BEHAT_SITE_RUNNING) {
         $attributes['required'] = 'required';
     }
 
