@@ -23,7 +23,6 @@
  * @author     Stuart Lamour <s.lamour@ucl.ac.uk>
  */
 
-
 use local_assess_type\assess_type;
 
 /**
